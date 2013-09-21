@@ -11,3 +11,17 @@
 *.lai
 *.la
 *.a
+
+# compiled android
+multiplatform-presentation/proj.android/obj/
+multiplatform-presentation/proj.android/bin/
+
+# Trash
+.DS_Store
+
+# xcode
+xcuserdata/
+project.xcworkspace/
+
+# eclipse prefs we don't want to save
+org.eclipse.cdt.codan.core.prefs

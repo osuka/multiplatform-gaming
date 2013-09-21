@@ -1,0 +1,9 @@
+eclipse.preferences.version=1
+environment/project/0.756827735/COCOS2DX_ROOT/delimiter=\:
+environment/project/0.756827735/COCOS2DX_ROOT/operation=append
+environment/project/0.756827735/COCOS2DX_ROOT/value=${COCOS2DX_ROOT}
+environment/project/0.756827735/NDK_ROOT/delimiter=\:
+environment/project/0.756827735/NDK_ROOT/operation=append
+environment/project/0.756827735/NDK_ROOT/value=${NDK_ROOT}
+environment/project/0.756827735/append=true
+environment/project/0.756827735/appendContributed=true
