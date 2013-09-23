@@ -18,9 +18,19 @@ Run!
 ```
 
 
-## iOS project notes
+## iOS and Mac project notes
 
-Particular to my case, because I want to have the project in a separate folder. Create a link cocos2dx to the COCOS2DX_ROOT, then changed all paths to point through that directory, as I couldn't use the environment variables to define it (#ugly).
+It's very important to understand the XCode structure:
+
+- In particular the Build Settings, with the "Levels" view, from right to left:
+  - There's settings for the system (default)
+  - Settings for project
+  - Settings for target (Hello Javascript iOS, Hello Javascript Mac)
+  - Resolved (combined) settings
+
+If you move the project around or its dependencies, you'll have to tweak settings taking into account each target and the shared components.
+
+Particular to my case, because I want to have the project in a separate folder. I have all paths relative to that directory so there's a lot of $(SRCDIR)/../../../cocos2d-x (#ugly).
 
 ## Android project notes
 
