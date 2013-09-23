@@ -36,11 +36,38 @@ var MyLayer = cc.Layer.extend({
         cc.associateWithNative( this, cc.Layer );
     },
 
+    onTouchesEnded: function (touches) {
+        // Find child clicked
+        cc.log("touches ended");
+        cc.log(this.helloImg);
+        var point = this.convertTouchToNodeSpace(touches[0]);
+        cc.log("clicked on " + point);
+        var i;
+        var children = this.getChildren();
+        for(i = 0; i < children.length; i++) {
+            var child = children[i];
+            cc.log("child " + child);
+            var boundingBox = child.getBoundingBox();
+            if (cc.rectContainsPoint(boundingBox, point)) {
+                cc.log("found on node " + i);
+                if (child.touched) {
+                    child.touched();
+                }
+            }
+        }
+    },
+
+    onTouchesBegan: function () {
+        cc.log("touches began");
+    },
+
     init:function () {
 
         //////////////////////////////
         // 1. super init first
         this._super();
+
+        this.setTouchEnabled(true);
 
         /////////////////////////////
         // 2. add a menu item with "X" image, which is clicked to quit the program
@@ -49,16 +76,18 @@ var MyLayer = cc.Layer.extend({
         var size = cc.Director.getInstance().getWinSize();
 
         // add a "close" icon to exit the progress. it's an autorelease object
+        var scaleLabel = (function () {
+            cc.log("close button was clicked.");
+            var action1 = cc.ScaleTo.create( 0.1 /* duration */, 1.2 /* scale */ );
+            var action2 = cc.ScaleTo.create( 0.05 /* duration */, 1.0 /* scale */ );
+            var sequence = cc.Sequence.create(action1, action2);
+            this.helloLabel.runAction(sequence);
+        }).bind(this);
         var closeItem = cc.MenuItemImage.create(
             "res/CloseNormal.png",
             "res/CloseSelected.png",
-            function () {
-                cc.log("close button was clicked.");
-                var action1 = cc.ScaleTo.create( 0.1 /* duration */, 1.2 /* scale */ );
-                var action2 = cc.ScaleTo.create( 0.05 /* duration */, 1.0 /* scale */ );
-                var sequence = cc.Sequence.create(action1, action2);
-                this.helloLabel.runAction(sequence);
-            },this);
+            scaleLabel,
+            this);
         closeItem.setAnchorPoint(cc.p(0.5, 0.5));
 
         var menu = cc.Menu.create(closeItem);
@@ -71,11 +100,12 @@ var MyLayer = cc.Layer.extend({
         // add a label shows "Hello World"
         // create and initialize a label
         // this.helloLabel = cc.LabelTTF.create("Hello World", "Arial", 38);
-        this.helloLabel = cc.LabelBMFont.create("Chapter 2", "res/headers-100.fnt");
+        this.helloLabel = cc.LabelBMFont.create("Chapter 1", "res/headers-100.fnt");
         // position the label on the center of the screen
         this.helloLabel.setPosition(cc.p(size.width * 0.10, size.height));
         this.helloLabel.setScale(1.0);
         this.helloLabel.setAnchorPoint(cc.p(0.0, 1.0));
+        this.helloLabel.touched = scaleLabel;
         // add the label as a child to this layer
         this.addChild(this.helloLabel, 5);
 
