@@ -4,6 +4,8 @@
 
 Currently Using the develop branch of cocos2d-x in github (3.0).
 
+Initial bas created like this:
+
 ```
 cd cocos2d-x
 git checkout develop
@@ -12,13 +14,9 @@ git merge origin/develop
 git submodule init
 git submodule update
 ./create-multi-platform-projects.py -p multiplatform-presentation -k com.gatillos.multiplatformpresentation -l javascript
-
-  Open multiplatform-presentation/proj.ios_mac/HelloJavascript.xcodeproj
-Run!
 ```
 
-
-## iOS and Mac project notes
+### iOS and Mac project creation notes
 
 It's very important to understand the XCode structure:
 
@@ -32,13 +30,13 @@ If you move the project around or its dependencies, you'll have to tweak setting
 
 Particular to my case, because I want to have the project in a separate folder. I have all paths relative to that directory so there's a lot of $(SRCDIR)/../../../cocos2d-x (#ugly).
 
-## Android project notes
+### Android project creation notes
 
 - Doesn't seem to copy javah builder. Edit `.project` and remove the external build (probably can be done via Eclipse). Can also be copied from other project. (`.externalToolBuilder` folder)
 - If desired, edit `jni/Application.mk` to add more binaries
   - armeabi armeabi-v7a
 - Defined in Preferences/C/C++/Build/Build Variables:
-  - `NDK_ROOT=/Users/OAmat/Documents/code/android/ndk`
+  - `NDK_ROOT=/Users/osuka/Documents/code/android/ndk`
   - `COCOS2DX_ROOT=/Users/osuka/Documents/code/cocos2d-x`
 - In environment defined them to export them as system variables
   - `NDK_ROOT=${NDK_ROOT}`
@@ -54,6 +52,12 @@ APP_ANDROID_ROOT="$DIR"
 BINDINGS_JS_ROOT="${COCOS2DX_ROOT}/scripting/javascript/bindings/js"
 ```
 
+# Compiling and running
+
+## XCode compiling for iOS and Mac
+
+Simply selection the target from _ios or _mac and build/run as usual.
+
 ## Command line compiling for Android
 
 ```
@@ -67,7 +71,14 @@ ant -Dsdk.dir=/Users/osuka/Documents/code/android/sdk/ debug install
 Open Android Developer Tools (Eclipse version, the other one doesn't support native code yet)
 
 * Import -> Existing Android Code into Workspace
-* Browse to `~/Documents/code/cocos2d-x/projects/multiplatform-presentation`
+* Browse to `multiplatform-presentation`
 * It will find `proj.android.` Click finish
+* Do the same for `cocos2d-x/cocos2dx/platform/android/java`. Create the `libcocos2dx`project.
 * You may have problems with Android versions. In theory it runs on 2.3+ (android 13). I'm going for API 14 (Android 4.0), just because I have a Kindle Fire HD. With no google APIs.
-  * So, open Project properties and set SDK to 4.0
+  * So, open Project properties and set SDK to 4.0 or whatever you want. Make sure you set the same for `libcocos2dx` and your app.
+* Define the following in Preferences / C/C++ / Build / Build Variables
+  - `NDK_ROOT=/Users/osuka/Documents/code/android/ndk`
+  - `COCOS2DX_ROOT=/Users/osuka/Documents/code/cocos2d-x`
+
+* Run as "Android Application"
+
