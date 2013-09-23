@@ -54,6 +54,10 @@ var MyLayer = cc.Layer.extend({
             "res/CloseSelected.png",
             function () {
                 cc.log("close button was clicked.");
+                var action1 = cc.ScaleTo.create( 0.1 /* duration */, 1.2 /* scale */ );
+                var action2 = cc.ScaleTo.create( 0.05 /* duration */, 1.0 /* scale */ );
+                var sequence = cc.Sequence.create(action1, action2);
+                this.helloLabel.runAction(sequence);
             },this);
         closeItem.setAnchorPoint(cc.p(0.5, 0.5));
 
@@ -66,9 +70,12 @@ var MyLayer = cc.Layer.extend({
         // 3. add your codes below...
         // add a label shows "Hello World"
         // create and initialize a label
-        this.helloLabel = cc.LabelTTF.create("Hello World", "Arial", 38);
+        // this.helloLabel = cc.LabelTTF.create("Hello World", "Arial", 38);
+        this.helloLabel = cc.LabelBMFont.create("Chapter 2", "res/headers-100.fnt");
         // position the label on the center of the screen
-        this.helloLabel.setPosition(cc.p(size.width / 2, size.height - 40));
+        this.helloLabel.setPosition(cc.p(size.width * 0.10, size.height));
+        this.helloLabel.setScale(1.0);
+        this.helloLabel.setAnchorPoint(cc.p(0.0, 1.0));
         // add the label as a child to this layer
         this.addChild(this.helloLabel, 5);
 
