@@ -16,6 +16,19 @@ git submodule update
 ./create-multi-platform-projects.py -p multiplatform-presentation -k com.gatillos.multiplatformpresentation -l javascript
 ```
 
+Requirements for using it with cocos2d-html:
+
+```
+git clone https://github.com/cocos2d/cocos2d-html5
+```
+
+Folder structure (for me):
+
+* cocos2d-x
+* cocos2d-html5
+* multiplatform-gaming
+  * multiplatform-presentation
+
 ### iOS and Mac project creation notes
 
 It's very important to understand the XCode structure:
@@ -82,3 +95,10 @@ Open Android Developer Tools (Eclipse version, the other one doesn't support nat
 
 * Run as "Android Application"
 
+## Web version
+
+The normal web version can be run by going to `proj.web` folder and launching.
+
+```
+python -m SimpleHTTPServer
+```
