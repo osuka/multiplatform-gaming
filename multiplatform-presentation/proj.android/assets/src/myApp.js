@@ -100,21 +100,51 @@ var MyLayer = cc.Layer.extend({
         // add a label shows "Hello World"
         // create and initialize a label
         // this.helloLabel = cc.LabelTTF.create("Hello World", "Arial", 38);
+        var scale = 1.0;
+        if (window.devicePixelRatio < 1.5 || window.innerWidth < 640) {
+            scale = 0.5;
+        }
         this.helloLabel = cc.LabelBMFont.create("Chapter 1", "res/headers-100.fnt");
         // position the label on the center of the screen
         this.helloLabel.setPosition(cc.p(size.width * 0.10, size.height));
-        this.helloLabel.setScale(1.0);
         this.helloLabel.setAnchorPoint(cc.p(0.0, 1.0));
         this.helloLabel.touched = scaleLabel;
         // add the label as a child to this layer
         this.addChild(this.helloLabel, 5);
 
         // add "Helloworld" splash screen"
-        this.sprite = cc.Sprite.create("res/HelloWorld.png");
-        this.sprite.setAnchorPoint(cc.p(0.5, 0.5));
-        this.sprite.setPosition(cc.p(size.width / 2, size.height / 2));
+        // this.sprite = cc.Sprite.create("res/HelloWorld.png");
+        // this.sprite.setAnchorPoint(cc.p(0.5, 0.5));
+        // this.sprite.setPosition(cc.p(size.width / 2, size.height / 2));
+        // this.addChild(this.sprite, 0);
 
-        this.addChild(this.sprite, 0);
+        // Load mario resources and create sprites
+        // good reference: http://www.cocos2d-x.org/forums/19/topics/23698
+        var spriteBatch = cc.SpriteBatchNode.create("res/mario-sheet_default.png");
+        var cache = cc.SpriteFrameCache.getInstance();
+        cache.addSpriteFrames("res/mario-sheet_default.plist");
+
+        var mario = cc.Sprite.createWithSpriteFrameName("minimario-walk-01.png");
+        spriteBatch.addChild(mario);
+        mario.setPosition(cc.p(0, size.height/2));
+        this.addChild(spriteBatch);
+
+        var animation = cc.Animation.create();
+        animation.addSpriteFrame(cache.getSpriteFrame("minimario-walk-01.png"));
+        animation.addSpriteFrame(cache.getSpriteFrame("minimario-walk-02.png"));
+        animation.setDelayPerUnit(0.150);
+        mario.runAction( cc.RepeatForever.create( cc.Animate.create(animation) ) );
+
+        var reachedBorder = function () {
+            mario.setScaleX( -1 * mario.getScaleX() ); // flips horizontally
+        };
+        mario.runAction( cc.RepeatForever.create(
+            cc.Sequence.create(
+                cc.MoveBy.create( 2, cc.p(size.width, 0) ),
+                cc.CallFunc.create(reachedBorder),
+                cc.MoveBy.create( 2, cc.p(-size.width, 0) ),
+                cc.CallFunc.create(reachedBorder)
+        )));
 
         return true;
     }
