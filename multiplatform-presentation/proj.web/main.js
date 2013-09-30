@@ -24,6 +24,41 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
+// Define a Fake "system.getDPI"
+if (typeof system === "undefined" || typeof system.getDPI === "undefined") {
+  system = {};
+  system.getDPI = function () {
+    // The concept of DPI doesn't exist on the web (sadly)
+    // so we are going to do an estimate
+    var width = window.screen ? window.screen.width : window.innerWidth;
+    var dpi = 96; // standard monitor
+    var dpiTable = [
+      { limit: 1.49, widths: [{width: 1024, dpi: 96},
+                              {width: 2048, dpi: 96*2}]},
+      { limit: 2.00, widths: [{width: 1024, dpi: 96*2},
+                              {width: 2048, dpi: 96*4}]},
+      { limit: 3.00, widths: [{width: 1024, dpi: 96*3},
+                              {width: 2048, dpi: 96*4}]},
+      { limit: 4.00, widths: [{width: 1024, dpi: 96*4},
+                              {width: 2048, dpi: 96*4}]}
+    ];
+
+    var i, j;
+    for(i = 0; i < dpiTable.length; i++) {
+      if (window.devicePixelRatio <= dpiTable[i].limit) {
+        for(j = 0; j < dpiTable[i].widths.length; j++) {
+          if (width <= dpiTable[i].widths[j].width) {
+            dpi = dpiTable[i].widths[j].dpi;
+            return dpi; // EXIT BUCLE AND FUNCTION
+          }
+        }
+      }
+    }
+
+    return dpi;
+  };
+}
+
 var cocos2dApp = cc.Application.extend({
     config:document['ccConfig'],
     ctor:function (scene) {

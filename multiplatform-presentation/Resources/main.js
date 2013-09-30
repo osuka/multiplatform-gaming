@@ -48,6 +48,7 @@ director.setAnimationInterval(1.0 / 60);
 // create a scene. it's an autorelease object
 var myScene = new MyScene();
 
+
 // run
 director.runWithScene(myScene);
 

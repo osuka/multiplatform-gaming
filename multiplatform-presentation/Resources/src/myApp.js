@@ -101,8 +101,8 @@ var MyLayer = cc.Layer.extend({
         // create and initialize a label
         // this.helloLabel = cc.LabelTTF.create("Hello World", "Arial", 38);
         var scale = 1.0;
-        if (window.devicePixelRatio < 1.5 || window.innerWidth < 640) {
-            scale = 0.5;
+        if (system.getDPI() > 150) {
+            scale = 2.0;
         }
         this.helloLabel = cc.LabelBMFont.create("Chapter 1", "res/headers-100.fnt");
         // position the label on the center of the screen
@@ -134,6 +134,8 @@ var MyLayer = cc.Layer.extend({
         animation.addSpriteFrame(cache.getSpriteFrame("minimario-walk-02.png"));
         animation.setDelayPerUnit(0.150);
         mario.runAction( cc.RepeatForever.create( cc.Animate.create(animation) ) );
+
+        mario.setScale(scale);
 
         var reachedBorder = function () {
             mario.setScaleX( -1 * mario.getScaleX() ); // flips horizontally
