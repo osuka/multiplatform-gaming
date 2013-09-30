@@ -33,6 +33,17 @@ var appFiles = [
     'src/myApp.js'
 ];
 
+var testJSB = new JSB.JSBinding();
+testJSB.functionTest();
+
+// Export Device's getDPI function (not available in browsers)
+if (typeof cc.Device === "undefined" || typeof cc.Device.getDPI === "undefined") {
+    cc.Device = {};
+    cc.Device.getDPI = function () {
+        return testJSB.getDPI();
+    }
+}
+
 cc.dumpConfig();
 
 for( var i=0; i < appFiles.length; i++) {

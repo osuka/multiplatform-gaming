@@ -101,8 +101,15 @@ var MyLayer = cc.Layer.extend({
         // create and initialize a label
         // this.helloLabel = cc.LabelTTF.create("Hello World", "Arial", 38);
         var scale = 1.0;
-        if (system.getDPI() > 150) {
-            scale = 2.0;
+        if (typeof cc.Device !== "undefined") {
+            cc.log("DPI: " + cc.Device.getDPI());
+            if (cc.Device.getDPI() < 150) {
+               scale = 2.0;
+            } else if (cc.Device.getDPI() < 300) {
+               scale = 4.0;
+            } else {
+               scale = 8.0;
+            }
         }
         this.helloLabel = cc.LabelBMFont.create("Chapter 1", "res/headers-100.fnt");
         // position the label on the center of the screen

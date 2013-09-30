@@ -56,6 +56,10 @@
 		0F97CAE717F0400A00BE9E2D /* libcocos2dx-extensions iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F0C8ACD17F032B10008B1BC /* libcocos2dx-extensions iOS.a */; };
 		0F97CAE817F0400A00BE9E2D /* libCocosDenshion iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F0C8AD317F032B10008B1BC /* libCocosDenshion iOS.a */; };
 		0F97CAE917F0400A00BE9E2D /* libjsbindings iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F0C8AD517F032B10008B1BC /* libjsbindings iOS.a */; };
+		0FD20F6D17F988B200CB35B8 /* JSBinding.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FD20F6B17F988B200CB35B8 /* JSBinding.cpp */; };
+		0FD20F6E17F988B200CB35B8 /* JSBinding.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FD20F6B17F988B200CB35B8 /* JSBinding.cpp */; };
+		0FD20F8117F9890F00CB35B8 /* JSB_AUTO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FD20F7F17F9890F00CB35B8 /* JSB_AUTO.cpp */; };
+		0FD20F8217F9890F00CB35B8 /* JSB_AUTO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FD20F7F17F9890F00CB35B8 /* JSB_AUTO.cpp */; };
 		1A82F5FB169AC92500C4B13A /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A82F5FA169AC92500C4B13A /* libsqlite3.dylib */; };
 		1A96A4F3174A3432008653A9 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A96A4F2174A3432008653A9 /* libcurl.a */; };
 		1AE4B40416D1FECD003C6D1C /* res in Resources */ = {isa = PBXBuildFile; fileRef = 1AE4B40116D1FECD003C6D1C /* res */; };
@@ -225,6 +229,10 @@
 		0F84118217F049A400F50869 /* jsb_sys.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = jsb_sys.js; path = "../../../cocos2d-x/scripting/javascript/bindings/js/jsb_sys.js"; sourceTree = "<group>"; };
 		0F84118317F049A400F50869 /* jsb.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = jsb.js; path = "../../../cocos2d-x/scripting/javascript/bindings/js/jsb.js"; sourceTree = "<group>"; };
 		0F84118417F049A400F50869 /* main.debug.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = main.debug.js; path = "../../../cocos2d-x/scripting/javascript/bindings/js/main.debug.js"; sourceTree = "<group>"; };
+		0FD20F6B17F988B200CB35B8 /* JSBinding.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JSBinding.cpp; sourceTree = "<group>"; };
+		0FD20F6C17F988B200CB35B8 /* JSBinding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSBinding.h; sourceTree = "<group>"; };
+		0FD20F7F17F9890F00CB35B8 /* JSB_AUTO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JSB_AUTO.cpp; sourceTree = "<group>"; };
+		0FD20F8017F9890F00CB35B8 /* JSB_AUTO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSB_AUTO.h; sourceTree = "<group>"; };
 		1A82F5FA169AC92500C4B13A /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		1A96A4F2174A3432008653A9 /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl.a; path = ../../../cocos2dx/platform/third_party/ios/libraries/libcurl.a; sourceTree = "<group>"; };
 		1AE4B40016D1FECD003C6D1C /* main.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = main.js; path = ../Resources/main.js; sourceTree = "<group>"; };
@@ -478,6 +486,10 @@
 			children = (
 				D4545215156E28EF00887EB5 /* AppDelegate.cpp */,
 				D4545216156E28EF00887EB5 /* AppDelegate.h */,
+				0FD20F6B17F988B200CB35B8 /* JSBinding.cpp */,
+				0FD20F6C17F988B200CB35B8 /* JSBinding.h */,
+				0FD20F7F17F9890F00CB35B8 /* JSB_AUTO.cpp */,
+				0FD20F8017F9890F00CB35B8 /* JSB_AUTO.h */,
 			);
 			name = Classes;
 			path = ../Classes;
@@ -729,7 +741,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0FD20F8217F9890F00CB35B8 /* JSB_AUTO.cpp in Sources */,
 				509D4AD117EBB2BE00697056 /* main.cpp in Sources */,
+				0FD20F6E17F988B200CB35B8 /* JSBinding.cpp in Sources */,
 				509D4A8117EBB24E00697056 /* AppDelegate.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -754,7 +768,9 @@
 				0F84119717F049A400F50869 /* jsb_opengl.js in Sources */,
 				0F84119117F049A400F50869 /* jsb_debugger.js in Sources */,
 				0F84118717F049A400F50869 /* jsb_chipmunk.js in Sources */,
+				0FD20F6D17F988B200CB35B8 /* JSBinding.cpp in Sources */,
 				0F84119D17F049A400F50869 /* main.debug.js in Sources */,
+				0FD20F8117F9890F00CB35B8 /* JSB_AUTO.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

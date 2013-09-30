@@ -24,10 +24,11 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
+
 // Define a Fake "system.getDPI"
-if (typeof system === "undefined" || typeof system.getDPI === "undefined") {
-  system = {};
-  system.getDPI = function () {
+if (typeof cc.Device === "undefined" || typeof cc.Device.getDPI === "undefined") {
+  cc.Device = {};
+  cc.Device.getDPI = function () {
     // The concept of DPI doesn't exist on the web (sadly)
     // so we are going to do an estimate
     var width = window.screen ? window.screen.width : window.innerWidth;

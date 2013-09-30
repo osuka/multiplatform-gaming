@@ -13,6 +13,7 @@
 #include "jsb_opengl_registration.h"
 #include "XMLHTTPRequest.h"
 #include "jsb_websocket.h"
+#include "JSB_AUTO.h"
 
 USING_NS_CC;
 using namespace CocosDenshion;
@@ -50,6 +51,9 @@ bool AppDelegate::applicationDidFinishLaunching()
     sc->addRegisterCallback(MinXmlHttpRequest::_js_register);
     sc->addRegisterCallback(register_jsb_websocket);
 
+    // own bindings
+    sc->addRegisterCallback(register_all_my_jsb);
+    
     sc->start();
     
     ScriptEngineProtocol *engine = ScriptingCore::getInstance();
