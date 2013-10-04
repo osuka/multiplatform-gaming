@@ -111,11 +111,12 @@ var MyLayer = cc.Layer.extend({
                scale = 8.0;
             }
         }
-        this.helloLabel = cc.LabelBMFont.create("Chapter 1", "res/headers-100.fnt");
+        this.helloLabel = cc.LabelBMFont.create("Chapter 1.\nThis is a multi-line text that should be word-wrapped accordingly.", "res/headers-100.fnt", size.width * 0.85);
         // position the label on the center of the screen
         this.helloLabel.setPosition(cc.p(size.width * 0.10, size.height));
         this.helloLabel.setAnchorPoint(cc.p(0.0, 1.0));
         this.helloLabel.touched = scaleLabel;
+        this.helloLabel.setScale(scale/4.0);
         // add the label as a child to this layer
         this.addChild(this.helloLabel, 5);
 
