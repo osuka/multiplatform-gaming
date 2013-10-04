@@ -7,7 +7,9 @@ LOCAL_MODULE := cocos2djs_shared
 LOCAL_MODULE_FILENAME := libcocos2djs
 
 LOCAL_SRC_FILES := hellojavascript/main.cpp \
-                   ../../Classes/AppDelegate.cpp
+                   ../../Classes/AppDelegate.cpp \
+                   ../../Classes/JSB_AUTO.cpp \
+                   ../../Classes/JSBinding.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes
 

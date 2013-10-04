@@ -116,6 +116,7 @@ var MyLayer = cc.Layer.extend({
         this.helloLabel.setPosition(cc.p(size.width * 0.10, size.height));
         this.helloLabel.setAnchorPoint(cc.p(0.0, 1.0));
         this.helloLabel.touched = scaleLabel;
+        this.helloLabel.setScale(scale/4.0);
         // add the label as a child to this layer
         this.addChild(this.helloLabel, 5);
 
