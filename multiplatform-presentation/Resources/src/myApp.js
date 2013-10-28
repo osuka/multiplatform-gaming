@@ -37,20 +37,41 @@ var CPSprite = cc.Sprite.extend({
 
         mass = mass || 5;
         this.init(filename);
-        var body = GlobalSpace.addBody(
-            new cp.Body(mass,
-                        cp.momentForBox(mass,
-                                        this.getContentSize().width,
-                                        this.getContentSize().height)));
-        body.setPos(cp.v(pos.x, pos.y));
-        var shape = GlobalSpace.addShape(
-            new cp.BoxShape(body,
-                            this.getContentSize().width,
-                            this.getContentSize().height));
-        shape.setElasticity(Elasticity || 0.2);
-        shape.setFriction(friction || 0.8);
-        this.body = body;
-        this.shape = shape;
+
+        // There is functionality that can be run only once we
+        // have loaded the image
+        var _this = this;
+        var postLoadAction = function () {
+            cc.log(_this.getContentSize());
+            var body = GlobalSpace.addBody(
+                new cp.Body(mass,
+                            cp.momentForBox(mass,
+                                            _this.getContentSize().width,
+                                            _this.getContentSize().height)) );
+            body.setPos(cp.v(pos.x, pos.y));
+            var shape = GlobalSpace.addShape(
+                new cp.BoxShape(body,
+                                _this.getContentSize().width,
+                                _this.getContentSize().height));
+            shape.setElasticity(Elasticity || 0.2);
+            shape.setFriction(friction || 0.8);
+            _this.body = body;
+            _this.shape = shape;
+        };
+
+        // Dynamic loading is required when running in a browser
+        // see http://www.cocos2d-x.org/forums/19/topics/15685
+        if (typeof document !== 'undefined') { // web
+           var texture = cc.TextureCache.getInstance().textureForKey(filename);
+           if (texture.isLoaded()) {
+             postLoadAction();
+           } else {
+             texture.addLoadedEventListener(postLoadAction);
+           }
+        } else {
+           postLoadAction();
+        }
+        return this;
     },
 });
 
