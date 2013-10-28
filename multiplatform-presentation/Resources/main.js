@@ -29,6 +29,7 @@
 require("jsb.js");
 
 var appFiles = [
+    'src/freewill/Freewill.js',
     'src/resource.js',
     'src/myApp.js'
 ];

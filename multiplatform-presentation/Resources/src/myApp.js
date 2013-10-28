@@ -24,6 +24,36 @@
  THE SOFTWARE.
  ****************************************************************************/
 
+var GlopbalSpace;
+
+// CPSprite from https://github.com/Wu-Hao/Cocos2d-Simple-Ragdoll/blob/master/src/CPApp.js
+
+var CPSprite = cc.Sprite.extend({
+    
+    ctor : function (filename, pos, mass, Elasticity, friction) {
+        this._super();
+        // needed for JS-Binding compatibility
+        cc.associateWithNative( this, cc.Sprite );
+
+        mass = mass || 5;
+        this.init(filename);
+        var body = GlobalSpace.addBody(
+            new cp.Body(mass,
+                        cp.momentForBox(mass,
+                                        this.getContentSize().width,
+                                        this.getContentSize().height)));
+        body.setPos(cp.v(pos.x, pos.y));
+        var shape = GlobalSpace.addShape(
+            new cp.BoxShape(body,
+                            this.getContentSize().width,
+                            this.getContentSize().height));
+        shape.setElasticity(Elasticity || 0.2);
+        shape.setFriction(friction || 0.8);
+        this.body = body;
+        this.shape = shape;
+    },
+});
+
 var MyLayer = cc.Layer.extend({
     isMouseDown:false,
     helloImg:null,
@@ -61,19 +91,62 @@ var MyLayer = cc.Layer.extend({
         cc.log("touches began");
     },
 
-    init:function () {
+    init: function () {
 
         //////////////////////////////
-        // 1. super init first
+        // super init first
         this._super();
 
         this.setTouchEnabled(true);
 
+        var size = cc.Director.getInstance().getWinSize();
+
+        //////////////////////////////
+        // create physics world
+        // https://github.com/Wu-Hao/Cocos2d-Simple-Ragdoll/blob/master/src/CPApp.js
+        GlobalSpace = new cp.Space();
+        GlobalSpace.iterations = 5;
+        GlobalSpace.gravity = cp.v(0, -400);
+        var thickness = 50;
+        var floor = GlobalSpace.addShape(new cp.SegmentShape(
+            GlobalSpace.staticBody,
+            cp.v(0, 0 - thickness),
+            cp.v(size.width, 0 - thickness),
+            thickness
+        ));
+        floor.setElasticity(1);
+        floor.setFriction(1);
+//        var lwall = GlobalSpace.addShape(new cp.SegmentShape(
+//            GlobalSpace.staticBody,
+//            cp.v(0-thickness, size.height),
+//            cp.v(0-thickness,0),
+//            thickness
+//        ));
+//        var rwall = GlobalSpace.addShape(new cp.SegmentShape(
+//            GlobalSpace.staticBody,
+//            cp.v(size.width + thickness, size.height),
+//            cp.v(size.width + thickness, 0),
+//            thickness
+//        ));
+//        var ceiling = GlobalSpace.addShape(new cp.SegmentShape(
+//            GlobalSpace.staticBody,
+//            cp.v(0, size.height + thickness),
+//            cp.v(size.width, size.height + thickness),
+//            thickness
+//        ));
+//        lwall.setElasticity(1);
+//        lwall.setFriction(1);
+//        rwall.setElasticity(1);
+//        rwall.setFriction(1);
+//        ceiling.setElasticity(1);
+//        ceiling.setFriction(1);
+        this.scheduleUpdate();
+        this.addJoystick(cc.p(size.width / 2, size.height / 2));
+                              
         /////////////////////////////
-        // 2. add a menu item with "X" image, which is clicked to quit the program
+        // add a menu item with "X" image, which is clicked to quit the program
         //    you may modify it.
         // ask director the window size
-        var size = cc.Director.getInstance().getWinSize();
 
         // add a "close" icon to exit the progress. it's an autorelease object
         var scaleLabel = (function () {
@@ -116,7 +189,7 @@ var MyLayer = cc.Layer.extend({
         this.helloLabel.setPosition(cc.p(size.width * 0.10, size.height));
         this.helloLabel.setAnchorPoint(cc.p(0.0, 1.0));
         this.helloLabel.touched = scaleLabel;
-        this.helloLabel.setScale(scale/4.0);
+        this.helloLabel.setScale(scale/8.0);
         // add the label as a child to this layer
         this.addChild(this.helloLabel, 5);
 
@@ -157,7 +230,38 @@ var MyLayer = cc.Layer.extend({
         )));
 
         return true;
-    }
+    },
+
+    addJoystick: function(pos) {
+        var joy_x = 400;
+        var joy_y = 400;
+
+//        this.joystickBase = new CPSprite('res/freewill/dpad.png',
+//                                         cc.p(joy_x, joy_y),
+//                                         10 /* mass */,
+//                                         0.1 /* elasticity */,
+//                                         10 /* friction */);
+//        this.addChild(joystickBase);
+        this.joystick2 = new CPSprite('res/freewill/dpad.png',
+                                      cc.p(joy_x, joy_y),
+                                      10 /* mass */,
+                                      0.1 /* elasticity */,
+                                      10 /* friction */);
+        this.addChild(this.joystick2);
+                            
+        this.joystick = new CPSprite('res/freewill/pad.png',
+                      cc.p(joy_x, joy_y),
+                      10 /* mass */,
+                      0.1 /* elasticity */,
+                      10 /* friction */);
+        this.addChild(this.joystick);
+    },
+                              
+    update : function (dt) {
+        GlobalSpace.step(dt);
+        var pos = this.joystick.body.getPos();
+        this.joystick.setPosition(cc.p(pos.x, pos.y));
+    },
 
 });
 
