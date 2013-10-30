@@ -498,9 +498,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		509D4A7517EBB24E00697056 /* Hello JavaScript Mac */ = {
+		509D4A7517EBB24E00697056 /* Multiplatform-Mac */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 509D4AA717EBB24E00697056 /* Build configuration list for PBXNativeTarget "Hello JavaScript Mac" */;
+			buildConfigurationList = 509D4AA717EBB24E00697056 /* Build configuration list for PBXNativeTarget "Multiplatform-Mac" */;
 			buildPhases = (
 				509D4A8017EBB24E00697056 /* Sources */,
 				509D4A8217EBB24E00697056 /* Frameworks */,
@@ -510,14 +510,14 @@
 			);
 			dependencies = (
 			);
-			name = "Hello JavaScript Mac";
+			name = "Multiplatform-Mac";
 			productName = HelloJavascript;
 			productReference = 509D4AAA17EBB24E00697056 /* Hello JavaScript Mac.app */;
 			productType = "com.apple.product-type.application";
 		};
-		A922753C1517C094001B78AA /* Hello JavaScript iOS */ = {
+		A922753C1517C094001B78AA /* Multiplatform-IOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A92277001517C097001B78AA /* Build configuration list for PBXNativeTarget "Hello JavaScript iOS" */;
+			buildConfigurationList = A92277001517C097001B78AA /* Build configuration list for PBXNativeTarget "Multiplatform-IOS" */;
 			buildPhases = (
 				A92275391517C094001B78AA /* Sources */,
 				A922753A1517C094001B78AA /* Frameworks */,
@@ -527,7 +527,7 @@
 			);
 			dependencies = (
 			);
-			name = "Hello JavaScript iOS";
+			name = "Multiplatform-IOS";
 			productName = HelloJavascript;
 			productReference = A922753D1517C094001B78AA /* Hello JavaScript iOS.app */;
 			productType = "com.apple.product-type.application";
@@ -563,8 +563,8 @@
 			);
 			projectRoot = "";
 			targets = (
-				A922753C1517C094001B78AA /* Hello JavaScript iOS */,
-				509D4A7517EBB24E00697056 /* Hello JavaScript Mac */,
+				A922753C1517C094001B78AA /* Multiplatform-IOS */,
+				509D4A7517EBB24E00697056 /* Multiplatform-Mac */,
 			);
 		};
 /* End PBXProject section */
@@ -1003,7 +1003,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		509D4AA717EBB24E00697056 /* Build configuration list for PBXNativeTarget "Hello JavaScript Mac" */ = {
+		509D4AA717EBB24E00697056 /* Build configuration list for PBXNativeTarget "Multiplatform-Mac" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				509D4AA817EBB24E00697056 /* Debug */,
@@ -1021,7 +1021,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A92277001517C097001B78AA /* Build configuration list for PBXNativeTarget "Hello JavaScript iOS" */ = {
+		A92277001517C097001B78AA /* Build configuration list for PBXNativeTarget "Multiplatform-IOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A92277011517C097001B78AA /* Debug */,
