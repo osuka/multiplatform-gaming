@@ -75,7 +75,6 @@ game.Cocos2dWebApp = cc.Application.extend({
 
     ctor : function (scene) {
         this._super();
-        this.startScene = scene;
         cc.COCOS2D_DEBUG = this.config['COCOS2D_DEBUG'];
         cc.initDebugSetting();
         cc.setup(this.config['tag']);
@@ -102,11 +101,11 @@ game.Cocos2dWebApp = cc.Application.extend({
 
         // preload resources for browser-hosted app, and only run after finishing
         cc.LoaderScene.preload(g_resources, function () {
-            director.replaceScene(new this.startScene());
+            director.replaceScene(new game.InitialScene(game.chapters[0]));
         }, this);
 
         return true;
     }
 });
 
-var the_app = new game.Cocos2dWebApp(game.InitialScene);
+var the_app = new game.Cocos2dWebApp();

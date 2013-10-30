@@ -35,16 +35,18 @@ require('src/freewill/Freewill.js');
 require('src/physicsSprite.js');
 require('src/resource.js');
 require('src/initialScene.js');
+require('src/chapters.js');
 
 // This is an example of exporting (binding) a C++ function to Javascript
-var testJSB = new JSB.JSBinding();
-testJSB.functionTest();
+game.testJSB = new JSB.JSBinding();
+game.testJSB.retain(); // don't want Spidermonkey to garbage collect this
+game.testJSB.functionTest();
 
 // Export Device's getDPI function (not available in browsers)
 if (typeof cc.Device === "undefined" || typeof cc.Device.getDPI === "undefined") {
     cc.Device = {};
     cc.Device.getDPI = function () {
-        return testJSB.getDPI();
+        return game.testJSB.getDPI();
     }
 }
 
@@ -53,15 +55,13 @@ cc.dumpConfig();
 
 // The director controles the game
 var director = cc.Director.getInstance();
-director.setDisplayStats(true);
+director.setDisplayStats(false);
 
 // set FPS. the default value is 1.0/60 if you don't call this
-director.setAnimationInterval(1.0 / 60);
+// Note: this doesn't seem to work for Mac or Android
+director.setAnimationInterval(1.0 / 30);
 
-// create a scene. it's an autorelease object
-var initialScene = new game.InitialScene();
-
-// run
-director.runWithScene(initialScene);
+// show initial chapter
+game.Controller.showChapter(0);
 
 }());

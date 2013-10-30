@@ -26,33 +26,27 @@
 
 var game = game || {};
 
+
+// Set scale based on DPI
+
+game.scale = 1.0; // is adjusted in scene creation
+
 game.BaseLayer = cc.Layer.extend({
 
-    isMouseDown:false,
-    helloImg:null,
-    helloLabel:null,
-    circle:null,
-    sprite:null,
-
-    ctor:function() {
+    ctor: function() {
         this._super();
         cc.associateWithNative( this, cc.Layer );
     },
 
     onTouchesEnded: function (touches) {
         // Find child clicked
-        cc.log("touches ended");
-        cc.log(this.helloImg);
         var point = this.convertTouchToNodeSpace(touches[0]);
-        cc.log("clicked on " + point);
         var i;
         var children = this.getChildren();
         for(i = 0; i < children.length; i++) {
             var child = children[i];
-            cc.log("child " + child);
             var boundingBox = child.getBoundingBox();
             if (cc.rectContainsPoint(boundingBox, point)) {
-                cc.log("found on node " + i);
                 if (child.touched) {
                     child.touched();
                 }
@@ -61,86 +55,23 @@ game.BaseLayer = cc.Layer.extend({
     },
 
     onTouchesBegan: function () {
-        cc.log("touches began");
     },
 
     init: function () {
 
-        //////////////////////////////
-        // super init first
         this._super();
 
         this.setTouchEnabled(true);
 
-        var size = cc.Director.getInstance().getWinSize();
-
-        //////////////////////////////
         // create physics world
-        // https://github.com/Wu-Hao/Cocos2d-Simple-Ragdoll/blob/master/src/CPApp.js
+        //
         game.space = new cp.Space();
         game.space.iterations = 5;
         game.space.gravity = cp.v(0, -400);
         
         this.createBoundaries();
         
-        this.scheduleUpdate();
-        this.addJoystick(cc.p(size.width / 2, size.height / 2));
-             
-        /////////////////////////////
-        // add a menu item with "X" image, which is clicked to quit the program
-        //    you may modify it.
-        // ask director the window size
-
-        // add a "close" icon to exit the progress. it's an autorelease object
-        var scaleLabel = (function () {
-            cc.log("close button was clicked.");
-            var action1 = cc.ScaleTo.create( 0.1 /* duration */, 1.2 /* scale */ );
-            var action2 = cc.ScaleTo.create( 0.05 /* duration */, 1.0 /* scale */ );
-            var sequence = cc.Sequence.create(action1, action2);
-            this.helloLabel.runAction(sequence);
-        }).bind(this);
-        var closeItem = cc.MenuItemImage.create(
-            "res/CloseNormal.png",
-            "res/CloseSelected.png",
-            scaleLabel,
-            this);
-        closeItem.setAnchorPoint(cc.p(0.5, 0.5));
-
-        var menu = cc.Menu.create(closeItem);
-        menu.setPosition(cc.p(0, 0));
-        this.addChild(menu, 1);
-        closeItem.setPosition(cc.p(size.width - 20, 20));
-
-        /////////////////////////////
-        // 3. add your codes below...
-        // add a label shows "Hello World"
-        // create and initialize a label
-        // this.helloLabel = cc.LabelTTF.create("Hello World", "Arial", 38);
-        var scale = 1.0;
-        if (typeof cc.Device !== "undefined") {
-            cc.log("DPI: " + cc.Device.getDPI());
-            if (cc.Device.getDPI() < 150) {
-               scale = 2.0;
-            } else if (cc.Device.getDPI() < 300) {
-               scale = 4.0;
-            } else {
-               scale = 8.0;
-            }
-        }
-        this.helloLabel = cc.LabelBMFont.create("Chapter 1.\nThis is a multi-line text that should be word-wrapped accordingly.", "res/headers-100.fnt", size.width * 0.85);
-        // position the label on the center of the screen
-        this.helloLabel.setPosition(cc.p(size.width * 0.10, size.height));
-        this.helloLabel.setAnchorPoint(cc.p(0.0, 1.0));
-        this.helloLabel.touched = scaleLabel;
-        this.helloLabel.setScale(scale/8.0);
-        // add the label as a child to this layer
-        this.addChild(this.helloLabel, 5);
-
-        // add "Helloworld" splash screen"
-        // this.sprite = cc.Sprite.create("res/HelloWorld.png");
-        // this.sprite.setAnchorPoint(cc.p(0.5, 0.5));
-        // this.sprite.setPosition(cc.p(size.width / 2, size.height / 2));
-        // this.addChild(this.sprite, 0);
+        this.addJoystick(cc.p(game.worldsize.width / 2, game.worldsize.height / 2));
 
         // Load mario resources and create sprites
         // good reference: http://www.cocos2d-x.org/forums/19/topics/23698
@@ -150,7 +81,7 @@ game.BaseLayer = cc.Layer.extend({
 
         var mario = cc.Sprite.createWithSpriteFrameName("minimario-walk-01.png");
         spriteBatch.addChild(mario);
-        mario.setPosition(cc.p(0, size.height/2));
+        mario.setPosition(cc.p(0, game.worldsize.height/2));
         this.addChild(spriteBatch);
 
         var animation = cc.Animation.create();
@@ -159,39 +90,101 @@ game.BaseLayer = cc.Layer.extend({
         animation.setDelayPerUnit(0.150);
         mario.runAction( cc.RepeatForever.create( cc.Animate.create(animation) ) );
 
-        mario.setScale(scale);
+        mario.setScale(game.scale);
 
         var reachedBorder = function () {
             mario.setScaleX( -1 * mario.getScaleX() ); // flips horizontally
         };
         mario.runAction( cc.RepeatForever.create(
             cc.Sequence.create(
-                cc.MoveBy.create( 2, cc.p(size.width, 0) ),
+                cc.MoveBy.create( 2, cc.p(game.worldsize.width, 0) ),
                 cc.CallFunc.create(reachedBorder),
-                cc.MoveBy.create( 2, cc.p(-size.width, 0) ),
+                cc.MoveBy.create( 2, cc.p(-game.worldsize.width, 0) ),
                 cc.CallFunc.create(reachedBorder)
         )));
 
-        // debug physics world
-        // (this bit of code is essential to understand what's happening)
-        game.debugDraw = new cc.PhysicsDebugNode();
-        game.debugDraw.init();
-        game.debugDraw.setSpace(game.space);
-        this.addChild(game.debugDraw);
-                                 
+        this.scheduleUpdate();
+//        this.toggleDebug();
         return true;
+    },
+    
+    // Add a title label
+    //
+    addTitle: function (text) {
+        this.titleLabel = cc.LabelBMFont.create(
+            text,
+            "res/headers-100.fnt",
+            game.worldsize.width*0.85,
+            cc.TEXT_ALIGNMENT_LEFT,
+            cc.p(0, 0)
+        );
+        this.setPosition(cc.p(game.worldsize.width * 0.10, game.worldsize.height));
+        this.titleLabel.setAnchorPoint(cc.p(0.0, 1.0));
+        this.titleLabel.setScale(game.scale/6.0);
+        this.addChild(this.titleLabel);
+        var _this = this;
+        this.titleLabel.touched = function () {
+            _this.toggleDebug();
+        };
+        return this.titleLabel;
+    },
+    
+    // Add text under the title
+    // - Text can be a string or an array of strings.
+    //
+    addBodyText: function (text) {
+        var str;
+        if (text instanceof Array) {
+            str = text.join('\n');
+        } else {
+            str = text;
+        }
+        this.bodyLabel = cc.LabelBMFont.create(
+            str,
+            "res/headers-100.fnt",
+            game.worldsize.width*0.85,
+            cc.TEXT_ALIGNMENT_LEFT,
+            cc.p(0, 0)
+        );
+        
+        // below title
+        this.bodyLabel.setAnchorPoint(cc.p(0.0, 1.0));
+        this.bodyLabel.setPosition(cc.p(0, -10 * game.scale));
+        this.bodyLabel.setScale(game.scale/8);
+        this.addChild(this.bodyLabel);
+        return this.bodyLabel;
+    },
+    
+    // Enable or disable debug
+    //
+    toggleDebug: function () {
+    
+        // display FPS
+        var director = cc.Director.getInstance();
+
+        // display physics objects
+        if (typeof game.debugDraw === 'undefined') {
+            game.debugDraw = new cc.PhysicsDebugNode();
+            game.debugDraw.init();
+            game.debugDraw.setSpace(game.space);
+            this.addChild(game.debugDraw);
+            director.setDisplayStats(true);
+        } else {
+            this.removeChild(game.debugDraw);
+            game.debugDraw = undefined;
+            director.setDisplayStats(false);
+        }
     },
 
     // Create physics objects to enclose the screen
     //
     createBoundaries: function () {
-        var size = cc.Director.getInstance().getWinSize();
         var thickness = 2;
 
         var floor = game.space.addShape(new cp.SegmentShape(
             game.space.staticBody,
             cp.v(0, thickness),
-            cp.v(size.width, thickness),
+            cp.v(game.worldsize.width, thickness),
             thickness
         ));
         floor.setElasticity(1);
@@ -199,7 +192,7 @@ game.BaseLayer = cc.Layer.extend({
 
         var lwall = game.space.addStaticShape(new cp.SegmentShape(
             game.space.staticBody,
-            cp.v(thickness, size.height),
+            cp.v(thickness, game.worldsize.height),
             cp.v(thickness, 0),
             thickness
         ));
@@ -208,8 +201,8 @@ game.BaseLayer = cc.Layer.extend({
         
         var rwall = game.space.addStaticShape(new cp.SegmentShape(
             game.space.staticBody,
-            cp.v(size.width - thickness, size.height),
-            cp.v(size.width - thickness, 0),
+            cp.v(game.worldsize.width - thickness, game.worldsize.height),
+            cp.v(game.worldsize.width - thickness, 0),
             thickness
         ));
         rwall.setElasticity(1);
@@ -217,8 +210,8 @@ game.BaseLayer = cc.Layer.extend({
 
         var ceiling = game.space.addStaticShape(new cp.SegmentShape(
             game.space.staticBody,
-            cp.v(0, size.height - thickness),
-            cp.v(size.width, size.height - thickness),
+            cp.v(0, game.worldsize.height - thickness),
+            cp.v(game.worldsize.width, game.worldsize.height - thickness),
             thickness
         ));
         ceiling.setElasticity(1);
@@ -280,15 +273,56 @@ game.BaseLayer = cc.Layer.extend({
 });
 
 game.InitialScene = cc.Scene.extend({
-    ctor:function() {
+    ctor: function(mainLayerClass) {
         this._super();
+
+        // save layer for later use
+        this.mainLayerClass = mainLayerClass;
         cc.associateWithNative( this, cc.Scene );
+        
+        // define world size
+        game.worldsize = cc.Director.getInstance().getWinSize();
+        
+        // update DPI
+        if (typeof cc.Device !== "undefined") {
+            cc.log("DPI: " + cc.Device.getDPI());
+            if (cc.Device.getDPI() < 150) {
+                game.scale = 2.0;
+            } else if (cc.Device.getDPI() < 300) {
+                game.scale = 3.0;
+            } else {
+                game.scale = 4.0;
+            }
+        }
     },
 
-    onEnter:function () {
+    onEnter: function () {
         this._super();
-        var layer = new game.BaseLayer();
+        var layer = new this.mainLayerClass();
         this.addChild(layer);
         layer.init();
     }
 });
+
+game.Controller = {
+
+    currentChapter: 0,
+
+    showChapter: function (n) {
+        this.currentChapter = n;
+        var newScene = new game.InitialScene(game.chapters[n]);
+        var director = cc.Director.getInstance();
+        if (!director.getRunningScene()) {
+            director.runWithScene(newScene);
+        } else {
+            director.replaceScene(newScene);
+        }
+    },
+    
+    showNextChapter: function () {
+        if (this.currentChapter < game.chapters.length - 1) {
+            this.showChapter(this.currentChapter + 1);
+        }
+    }
+};
+

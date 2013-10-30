@@ -40,7 +40,8 @@
         appFiles:[
             'src/resource.js',
             'src/physicsSprite.js',
-            'src/initialScene.js'//add your own files in order here
+            'src/initialScene.js',
+            'src/chapters.js'
         ]
     };
 
