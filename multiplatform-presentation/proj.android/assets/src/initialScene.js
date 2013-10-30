@@ -139,6 +139,9 @@ game.BaseLayer = cc.Layer.extend({
         } else {
             str = text;
         }
+        
+        var pos_y = this.titleLabel.getBoundingBox().height;
+        
         this.bodyLabel = cc.LabelBMFont.create(
             str,
             "res/headers-100.fnt",
@@ -149,7 +152,7 @@ game.BaseLayer = cc.Layer.extend({
         
         // below title
         this.bodyLabel.setAnchorPoint(cc.p(0.0, 1.0));
-        this.bodyLabel.setPosition(cc.p(0, -10 * game.scale));
+        this.bodyLabel.setPosition(cc.p(0, - pos_y));
         this.bodyLabel.setScale(game.scale/8);
         this.addChild(this.bodyLabel);
         return this.bodyLabel;
