@@ -93,15 +93,9 @@ game.Cocos2dWebApp = cc.Application.extend({
         // cc.EGLView.getInstance().setDesignResolutionSize(800, 450, cc.RESOLUTION_POLICY.SHOW_ALL);
         cc.EGLView.getInstance().setDesignResolutionSize(window.innerWidth, innerHeight, cc.RESOLUTION_POLICY.SHOW_ALL);
 
-        // turn on display FPS
-        director.setDisplayStats(this.config['showFPS']);
-
-        // set FPS. the default value is 1.0/60 if you don't call this
-        director.setAnimationInterval(1.0 / this.config['frameRate']);
-
         // preload resources for browser-hosted app, and only run after finishing
         cc.LoaderScene.preload(g_resources, function () {
-            director.replaceScene(new game.InitialScene(game.chapters[0]));
+            game.Controller.boot();
         }, this);
 
         return true;
