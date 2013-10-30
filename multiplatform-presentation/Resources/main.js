@@ -26,14 +26,17 @@
 // boot code needed for cocos2d + JS bindings.
 // Not needed by cocos2d-html5
 
-require("jsb.js");
+(function () {
 
-var appFiles = [
-    'src/freewill/Freewill.js',
-    'src/resource.js',
-    'src/myApp.js'
-];
+// this silly 'require' is not requirejs or nodejs require, it just loads a
+// file and executes it
+require('jsb.js');
+require('src/freewill/Freewill.js');
+require('src/physicsSprite.js');
+require('src/resource.js');
+require('src/initialScene.js');
 
+// This is an example of exporting (binding) a C++ function to Javascript
 var testJSB = new JSB.JSBinding();
 testJSB.functionTest();
 
@@ -45,12 +48,10 @@ if (typeof cc.Device === "undefined" || typeof cc.Device.getDPI === "undefined")
     }
 }
 
+// Debug, dump info about the current context
 cc.dumpConfig();
 
-for( var i=0; i < appFiles.length; i++) {
-    require( appFiles[i] );
-}
-
+// The director controles the game
 var director = cc.Director.getInstance();
 director.setDisplayStats(true);
 
@@ -58,9 +59,9 @@ director.setDisplayStats(true);
 director.setAnimationInterval(1.0 / 60);
 
 // create a scene. it's an autorelease object
-var myScene = new MyScene();
-
+var initialScene = new game.InitialScene();
 
 // run
-director.runWithScene(myScene);
+director.runWithScene(initialScene);
 
+}());

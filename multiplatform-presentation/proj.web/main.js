@@ -25,7 +25,13 @@
  THE SOFTWARE.
  ****************************************************************************/
 
+var game = game || {};
+
 // Define a Fake "system.getDPI"
+// This attempts to define an equivalent concept of 'dpi' to the real one
+// that can be used to resize assets in web browsers
+// It uses real screen size instead of window size.
+//
 if (typeof cc.Device === "undefined" || typeof cc.Device.getDPI === "undefined") {
   cc.Device = {};
   cc.Device.getDPI = function () {
@@ -60,9 +66,14 @@ if (typeof cc.Device === "undefined" || typeof cc.Device.getDPI === "undefined")
   };
 }
 
-var cocos2dApp = cc.Application.extend({
-    config:document['ccConfig'],
-    ctor:function (scene) {
+// Initialization thas is specific to cocos2d-x for HTML5
+// (this code is not run in native-based projects)
+//
+game.Cocos2dWebApp = cc.Application.extend({
+
+    config : document['ccConfig'],
+
+    ctor : function (scene) {
         this._super();
         this.startScene = scene;
         cc.COCOS2D_DEBUG = this.config['COCOS2D_DEBUG'];
@@ -70,6 +81,7 @@ var cocos2dApp = cc.Application.extend({
         cc.setup(this.config['tag']);
         cc.AppController.shareAppController().didFinishLaunchingWithOptions();
     },
+
     applicationDidFinishLaunching:function () {
         if(cc.RenderDoesnotSupport()){
             //show Information to user
@@ -88,7 +100,7 @@ var cocos2dApp = cc.Application.extend({
         // set FPS. the default value is 1.0/60 if you don't call this
         director.setAnimationInterval(1.0 / this.config['frameRate']);
 
-        //load resources
+        // preload resources for browser-hosted app, and only run after finishing
         cc.LoaderScene.preload(g_resources, function () {
             director.replaceScene(new this.startScene());
         }, this);
@@ -96,4 +108,5 @@ var cocos2dApp = cc.Application.extend({
         return true;
     }
 });
-var myApp = new cocos2dApp(MyScene);
+
+var the_app = new game.Cocos2dWebApp(game.InitialScene);

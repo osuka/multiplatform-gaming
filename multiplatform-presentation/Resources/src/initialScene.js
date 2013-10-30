@@ -24,58 +24,10 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-var GlopbalSpace;
+var game = game || {};
 
-// CPSprite from https://github.com/Wu-Hao/Cocos2d-Simple-Ragdoll/blob/master/src/CPApp.js
+game.BaseLayer = cc.Layer.extend({
 
-var CPSprite = cc.Sprite.extend({
-    
-    ctor : function (filename, pos, mass, Elasticity, friction) {
-        this._super();
-        // needed for JS-Binding compatibility
-        cc.associateWithNative( this, cc.Sprite );
-
-        mass = mass || 5;
-        this.init(filename);
-
-        // There is functionality that can be run only once we
-        // have loaded the image
-        var _this = this;
-        var postLoadAction = function () {
-            cc.log(_this.getContentSize());
-            var body = GlobalSpace.addBody(
-                new cp.Body(mass,
-                            cp.momentForBox(mass,
-                                            _this.getContentSize().width,
-                                            _this.getContentSize().height)) );
-            body.setPos(cp.v(pos.x, pos.y));
-            var shape = GlobalSpace.addShape(
-                new cp.BoxShape(body,
-                                _this.getContentSize().width,
-                                _this.getContentSize().height));
-            shape.setElasticity(Elasticity || 0.2);
-            shape.setFriction(friction || 0.8);
-            _this.body = body;
-            _this.shape = shape;
-        };
-
-        // Dynamic loading is required when running in a browser
-        // see http://www.cocos2d-x.org/forums/19/topics/15685
-        if (typeof document !== 'undefined') { // web
-           var texture = cc.TextureCache.getInstance().textureForKey(filename);
-           if (texture.isLoaded()) {
-             postLoadAction();
-           } else {
-             texture.addLoadedEventListener(postLoadAction);
-           }
-        } else {
-           postLoadAction();
-        }
-        return this;
-    },
-});
-
-var MyLayer = cc.Layer.extend({
     isMouseDown:false,
     helloImg:null,
     helloLabel:null,
@@ -125,45 +77,15 @@ var MyLayer = cc.Layer.extend({
         //////////////////////////////
         // create physics world
         // https://github.com/Wu-Hao/Cocos2d-Simple-Ragdoll/blob/master/src/CPApp.js
-        GlobalSpace = new cp.Space();
-        GlobalSpace.iterations = 5;
-        GlobalSpace.gravity = cp.v(0, -400);
-        var thickness = 50;
-        var floor = GlobalSpace.addShape(new cp.SegmentShape(
-            GlobalSpace.staticBody,
-            cp.v(0, 0 - thickness),
-            cp.v(size.width, 0 - thickness),
-            thickness
-        ));
-        floor.setElasticity(1);
-        floor.setFriction(1);
-//        var lwall = GlobalSpace.addShape(new cp.SegmentShape(
-//            GlobalSpace.staticBody,
-//            cp.v(0-thickness, size.height),
-//            cp.v(0-thickness,0),
-//            thickness
-//        ));
-//        var rwall = GlobalSpace.addShape(new cp.SegmentShape(
-//            GlobalSpace.staticBody,
-//            cp.v(size.width + thickness, size.height),
-//            cp.v(size.width + thickness, 0),
-//            thickness
-//        ));
-//        var ceiling = GlobalSpace.addShape(new cp.SegmentShape(
-//            GlobalSpace.staticBody,
-//            cp.v(0, size.height + thickness),
-//            cp.v(size.width, size.height + thickness),
-//            thickness
-//        ));
-//        lwall.setElasticity(1);
-//        lwall.setFriction(1);
-//        rwall.setElasticity(1);
-//        rwall.setFriction(1);
-//        ceiling.setElasticity(1);
-//        ceiling.setFriction(1);
+        game.space = new cp.Space();
+        game.space.iterations = 5;
+        game.space.gravity = cp.v(0, -400);
+        
+        this.createBoundaries();
+        
         this.scheduleUpdate();
         this.addJoystick(cc.p(size.width / 2, size.height / 2));
-                              
+             
         /////////////////////////////
         // add a menu item with "X" image, which is clicked to quit the program
         //    you may modify it.
@@ -250,43 +172,114 @@ var MyLayer = cc.Layer.extend({
                 cc.CallFunc.create(reachedBorder)
         )));
 
+        // debug physics world
+        // (this bit of code is essential to understand what's happening)
+        game.debugDraw = new cc.PhysicsDebugNode();
+        game.debugDraw.init();
+        game.debugDraw.setSpace(game.space);
+        this.addChild(game.debugDraw);
+                                 
         return true;
     },
 
-    addJoystick: function(pos) {
-        var joy_x = 400;
-        var joy_y = 400;
+    // Create physics objects to enclose the screen
+    //
+    createBoundaries: function () {
+        var size = cc.Director.getInstance().getWinSize();
+        var thickness = 2;
 
-//        this.joystickBase = new CPSprite('res/freewill/dpad.png',
+        var floor = game.space.addShape(new cp.SegmentShape(
+            game.space.staticBody,
+            cp.v(0, thickness),
+            cp.v(size.width, thickness),
+            thickness
+        ));
+        floor.setElasticity(1);
+        floor.setFriction(1);
+
+        var lwall = game.space.addStaticShape(new cp.SegmentShape(
+            game.space.staticBody,
+            cp.v(thickness, size.height),
+            cp.v(thickness, 0),
+            thickness
+        ));
+        lwall.setElasticity(1);
+        lwall.setFriction(1);
+        
+        var rwall = game.space.addStaticShape(new cp.SegmentShape(
+            game.space.staticBody,
+            cp.v(size.width - thickness, size.height),
+            cp.v(size.width - thickness, 0),
+            thickness
+        ));
+        rwall.setElasticity(1);
+        rwall.setFriction(1);
+
+        var ceiling = game.space.addStaticShape(new cp.SegmentShape(
+            game.space.staticBody,
+            cp.v(0, size.height - thickness),
+            cp.v(size.width, size.height - thickness),
+            thickness
+        ));
+        ceiling.setElasticity(1);
+        ceiling.setFriction(1);
+    },
+
+    addJoystick: function(pos) {
+//        this.joystickBase = new game.PhysicsSprite('res/freewill/dpad.png',
 //                                         cc.p(joy_x, joy_y),
 //                                         10 /* mass */,
 //                                         0.1 /* elasticity */,
 //                                         10 /* friction */);
 //        this.addChild(joystickBase);
-        this.joystick2 = new CPSprite('res/freewill/dpad.png',
-                                      cc.p(joy_x, joy_y),
-                                      10 /* mass */,
-                                      0.1 /* elasticity */,
-                                      10 /* friction */);
-        this.addChild(this.joystick2);
+//        this.joystick2 = new game.PhysicsSprite('res/freewill/dpad.png',
+//                                      cc.p(joy_x, joy_y),
+//                                      10 /* mass */,
+//                                      0.1 /* elasticity */,
+//                                      10 /* friction */);
+//        this.addChild(this.joystick2);
                             
-        this.joystick = new CPSprite('res/freewill/pad.png',
-                      cc.p(joy_x, joy_y),
-                      10 /* mass */,
-                      0.1 /* elasticity */,
-                      10 /* friction */);
-        this.addChild(this.joystick);
+//        this.joystick = new game.PhysicsSprite(
+//            'res/freewill/pad.png',
+//            cc.p(pos.x, pos.y),
+//            5 /* mass */,
+//            0 /* elasticity */,
+//            0 /* friction */);
+//        this.addChild(this.joystick);
+
+        var _this = this;
+
+        var addCreatedSprite = function (sprite) {
+            _this.addChild(sprite);
+        };
+
+        this.joystickBase = game.PhysicsSpriteHelper.createSprite({
+            file : 'res/freewill/dpad.png',
+            pos : cc.p(pos.x, pos.y),
+            mass : 5,
+            elasticity : 0,
+            friction : 0,
+            callback: addCreatedSprite
+        });
+
+        this.joystick = game.PhysicsSpriteHelper.createSprite({
+            file : 'res/freewill/pad.png',
+            pos : cc.p(pos.x, pos.y),
+            mass : 5,
+            elasticity : 0,
+            friction : 0,
+            callback: addCreatedSprite
+        });
+
     },
                               
     update : function (dt) {
-        GlobalSpace.step(dt);
-        var pos = this.joystick.body.getPos();
-        this.joystick.setPosition(cc.p(pos.x, pos.y));
+        game.space.step(dt);
     },
 
 });
 
-var MyScene = cc.Scene.extend({
+game.InitialScene = cc.Scene.extend({
     ctor:function() {
         this._super();
         cc.associateWithNative( this, cc.Scene );
@@ -294,7 +287,7 @@ var MyScene = cc.Scene.extend({
 
     onEnter:function () {
         this._super();
-        var layer = new MyLayer();
+        var layer = new game.BaseLayer();
         this.addChild(layer);
         layer.init();
     }

@@ -39,7 +39,8 @@
         //SingleEngineFile:'',
         appFiles:[
             'src/resource.js',
-            'src/myApp.js'//add your own files in order here
+            'src/physicsSprite.js',
+            'src/initialScene.js'//add your own files in order here
         ]
     };
 
