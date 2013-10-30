@@ -545,7 +545,7 @@
 					};
 				};
 			};
-			buildConfigurationList = A92275371517C094001B78AA /* Build configuration list for PBXProject "HelloJavascript" */;
+			buildConfigurationList = A92275371517C094001B78AA /* Build configuration list for PBXProject "multiplatformgaming" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -1012,7 +1012,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A92275371517C094001B78AA /* Build configuration list for PBXProject "HelloJavascript" */ = {
+		A92275371517C094001B78AA /* Build configuration list for PBXProject "multiplatformgaming" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A92276FE1517C097001B78AA /* Debug */,
