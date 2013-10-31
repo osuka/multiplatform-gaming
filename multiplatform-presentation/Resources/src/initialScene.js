@@ -39,24 +39,66 @@ game.BaseLayer = cc.Layer.extend({
     },
 
     onTouchesEnded: function (touches) {
-        // Find child clicked
+        // Find child clicked - children are ordered by zorder
+        // in parent
         if (!touches) return;
         var point = this.convertTouchToNodeSpace(touches[0]);
         var i;
         var children = this.getChildren();
-        for(i = 0; i < children.length; i++) {
+        for(i = children.length-1; i >= 0; i--) {
             var child = children[i];
             var boundingBox = child.getBoundingBox();
             if (cc.rectContainsPoint(boundingBox, point)) {
                 if (child.touched) {
-                    child.touched();
+                    var result = child.touched(point);
+                    if (result) { // stop propagating event if true
+                        return;
+                    }
                 }
             }
         }
     },
 
-    onTouchesBegan: function () {
-        cc.log('Touching');
+    onTouchesMoved: function (touches) {
+        // Find child clicked - children are ordered by zorder
+        // in parent
+        if (!touches) return;
+        var point = this.convertTouchToNodeSpace(touches[0]);
+        var i;
+        var children = this.getChildren();
+        for(i = children.length-1; i >= 0; i--) {
+            var child = children[i];
+            var boundingBox = child.getBoundingBox();
+            if (cc.rectContainsPoint(boundingBox, point)) {
+                if (child.touchedMoved) {
+                    var result = child.touchedMoved(point);
+                    if (result) { // stop propagating event if true
+                        return;
+                    }
+                }
+            }
+        }
+    },
+
+    onTouchesBegan: function (touches) {
+        // Find child clicked - children are ordered by zorder
+        // in parent
+        if (!touches) return;
+        var point = this.convertTouchToNodeSpace(touches[0]);
+        var i;
+        var children = this.getChildren();
+        for(i = children.length-1; i >= 0; i--) {
+            var child = children[i];
+            var boundingBox = child.getBoundingBox();
+            if (cc.rectContainsPoint(boundingBox, point)) {
+                if (child.touchedStart) {
+                    var result = child.touchedStart(point);
+                    if (result) { // stop propagating event if true
+                        return;
+                    }
+                }
+            }
+        }
     },
 
     init: function () {
@@ -205,34 +247,66 @@ game.BaseLayer = cc.Layer.extend({
         var pos = cc.p(300, 300);
         var joystickBase = cc.Sprite.create('res/freewill/dpad.png');
         joystickBase.setPosition(pos);
-
+        joystickBase.setZOrder(100);
+        joystickBase.touchedStart = joystickBase.touchedMoved = function (touchPoint) {
+            game.joystick.stopAllActions();
+            game.joystick.setPosition(touchPoint);
+            return true; // consume event
+        };
+        joystickBase.touched = function (touchPoint) {
+            game.joystick.setPosition(touchPoint);
+            game.joystick.stopAllActions();
+            var center = joystickBase.getPosition();
+            var xd = touchPoint.x - center.x;
+            var yd = touchPoint.y - center.y;
+            var distance = Math.sqrt(xd*xd + yd*yd);
+            game.joystick.runAction(cc.MoveTo.create( 0.10, center ));
+            return true; // consume event
+        };
         this.addChild(joystickBase);
 
-        var centerBody = new cp.StaticBody(5,1);
-        centerBody.setPos(cc.p(300, 300));
-        // game.space.addBody(centerBody);
+        game.joystick = cc.Sprite.create('res/freewill/pad.png');
+        game.joystick.setPosition(pos);
+        game.joystick.setZOrder(110);
+        this.addChild(game.joystick);
 
-        var joystick = game.PhysicsSpriteHelper.createSprite({
-            file : 'res/freewill/pad.png',
-            pos : pos,
-            mass : 5,
-            elasticity : 0,
-            friction : 0,
-            callback: function (sprite) {
-                _this.addChild(sprite);
-            }
-        });
-        joystick.body.setPos(pos);
 
-        // join pad to a fixed point
-        var constraint = new cp.SlideJoint(joystick.body, centerBody, cp.v(0, 0), cp.v(0, 0), 0, 75);
-        // var constraint = new cp.PinJoint(centerBody, joystick.body, cc.p(0, 0), cc.p(0,0));
-        game.space.addConstraint(constraint);
+        // var centerBody = new cp.StaticBody(5,1);
+        // centerBody.setPos(cc.p(300, 300));
+        // // game.space.addBody(centerBody);
+
+        // game.joystick = game.PhysicsSpriteHelper.createSprite({
+        //     space : game.joystickSpace,
+        //     file : 'res/freewill/pad.png',
+        //     pos : pos,
+        //     mass : 5,
+        //     elasticity : 0,
+        //     friction : 0,
+        //     callback: function (sprite) {
+        //         _this.addChild(sprite);
+        //     }
+        // });
+        // game.joystick.body.setPos(pos);
+        // // game.joystick.body.setVel(cp.v(25,25));
+        // game.joystick.setZOrder(110);
+        // // game.joystick.touched = function () {
+        // //     cc.log('Joystick tocado');
+        // //     return true; // consume event
+        // // };
+
+        // // join pad to a fixed point
+        // var constraint = new cp.SlideJoint(game.joystick.body, centerBody, cp.v(0, 0), cp.v(0, 0), 0, 75);
+        // // var constraint = new cp.DampedSpring(game.joystick.body, centerBody, cp.v(0, 0), cp.v(0, 0), 0, 1000, 150);
+        // // var constraint = new cp.PinJoint(centerBody, joystick.body, cc.p(0, 0), cc.p(0,0));
+        // game.joystickSpace.addConstraint(constraint);
 
     },
                               
     update : function (dt) {
         game.space.step(dt);
+        if (game.joystickSpace) {
+            game.joystickSpace.step(dt);
+        }
     },
 
 });
