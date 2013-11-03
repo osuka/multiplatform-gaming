@@ -47,21 +47,12 @@ if (typeof cc.Device === "undefined" || typeof cc.Device.getDPI === "undefined")
     cc.Device = {};
     cc.Device.getDPI = function () {
         return game.testJSB.getDPI();
-    }
+    };
 }
 
 // Debug, dump info about the current context
 cc.dumpConfig();
 
-// The director controles the game
-var director = cc.Director.getInstance();
-director.setDisplayStats(false);
-
-// set FPS. the default value is 1.0/60 if you don't call this
-// Note: this doesn't seem to work for Mac or Android
-director.setAnimationInterval(1.0 / 30);
-
-// show initial chapter
-game.Controller.showChapter(0);
+game.Controller.boot();
 
 }());

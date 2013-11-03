@@ -26,6 +26,11 @@ game.PhysicsSpriteHelper = {
 
         var postLoadAction = function () {
         
+            var space = game.space;
+            if (typeof params.space !== 'undefined') {
+                space = params.space;
+            }
+
             // Image size
             var spriteWidth = sprite.getContentSize().width;
             var spriteHeight = sprite.getContentSize().height;
@@ -43,12 +48,12 @@ game.PhysicsSpriteHelper = {
               angle = params.angle;
             }
             body.setAngle(angle);
-            game.space.addBody(body);
+            space.addBody(body);
             sprite.setBody(body);
             
             // Contact shape for the body
             var shape = new cp.BoxShape(body, spriteWidth, spriteHeight);
-            game.space.addShape(shape);
+            space.addShape(shape);
             var elasticity = 0.2;
             if (typeof params.elasticity !== 'undefined') {
                 elasticity = params.elasticity;
