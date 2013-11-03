@@ -4,7 +4,7 @@
 
 Currently Using the develop branch of cocos2d-x in github (3.0).
 
-Initial bas created like this:
+Initial base project created like this:
 
 ```
 cd cocos2d-x
@@ -29,6 +29,8 @@ Folder structure (for me):
 * multiplatform-gaming
   * multiplatform-presentation
 
+There are symbolic links in the repo that expect this structure. If you have things differently, just update the symlinks.
+
 ### iOS and Mac project creation notes
 
 It's very important to understand the XCode structure:
@@ -36,7 +38,7 @@ It's very important to understand the XCode structure:
 - In particular the Build Settings, with the "Levels" view, from right to left:
   - There's settings for the system (default)
   - Settings for project
-  - Settings for target (Hello Javascript iOS, Hello Javascript Mac)
+  - Settings for target (iOS, Mac)
   - Resolved (combined) settings
 
 If you move the project around or its dependencies, you'll have to tweak settings taking into account each target and the shared components.
@@ -102,3 +104,11 @@ The normal web version can be run by going to `proj.web` folder and launching.
 ```
 python -m SimpleHTTPServer
 ```
+
+## Windows version
+
+I haven't been able to even try running it yet, but the theory is that all you might need is renaming some files under proj.win32 and updating some paths. Feel free to open a PR if you do.
+
+# Final notes
+
+cocos2d-x is having a major refactoring that includes lots of directory renaming and moving. I'll try to keep up with the changes but if you run into trouble, just checkout to 3e017e1a4249a4364ef9c51d0d79350ef957afa1 for cocos2d-x and 3aef34057cf6e16cbf50f2e67f260fd57e473430 for cocos2d-html. Later versions are likely to work fine though.
