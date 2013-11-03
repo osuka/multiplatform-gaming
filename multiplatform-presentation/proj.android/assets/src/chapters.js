@@ -19,10 +19,6 @@ game.chapters.push( game.BaseLayer.extend({
         
         this.addBodyText(text);
         return true;
-    },
-
-    fire: function () {
-        game.Controller.showNextChapter();
     }
 
 }));
@@ -55,12 +51,9 @@ game.chapters.push( game.BaseLayer.extend({
     },
 
     addMario: function () {
-        // Load mario resources and create sprites
-        // good reference: http://www.cocos2d-x.org/forums/19/topics/23698
-        var spriteBatch = cc.SpriteBatchNode.create("res/mario-sheet_default.png");
-        var cache = cc.SpriteFrameCache.getInstance();
-        cache.addSpriteFrames("res/mario-sheet_default.plist");
 
+        var cache = cc.SpriteFrameCache.getInstance();
+        var spriteBatch = this.getChildByTagRecursive(this, this.TAG_SPRITEBATCH);
         var mario = cc.Sprite.createWithSpriteFrameName("minimario-walk-01.png");
         spriteBatch.addChild(mario, 0, this.TAG_MARIO);
         mario.setPosition(cc.p(0, game.worldsize.height/2));
@@ -84,10 +77,9 @@ game.chapters.push( game.BaseLayer.extend({
                 cc.CallFunc.create(reachedBorder)
         )));
 
-        this.addChild(spriteBatch);
     },
 
-    fire: function () {
+    fire1: function () {
         //game.Controller.showNextChapter();
         var height = game.worldsize.height/5;
         var mario = this.getChildByTagRecursive(this, this.TAG_MARIO);
@@ -135,7 +127,7 @@ game.chapters.push( game.BaseLayer.extend({
         };
 
         this.joystickBase = game.PhysicsSpriteHelper.createSprite({
-            file : 'res/freewill/dpad.png',
+            file : 'res/CloseSelected.png',
             pos : cc.p(pos.x, pos.y),
             mass : 5,
             elasticity : 0.8,
@@ -144,7 +136,7 @@ game.chapters.push( game.BaseLayer.extend({
         });
 
         this.joystick = game.PhysicsSpriteHelper.createSprite({
-            file : 'res/freewill/pad.png',
+            file : 'res/CloseNormal.png',
             pos : cc.p(pos.x, pos.y),
             mass : 5,
             elasticity : 0,
@@ -153,5 +145,4 @@ game.chapters.push( game.BaseLayer.extend({
         });
 
     }
-
 }));
