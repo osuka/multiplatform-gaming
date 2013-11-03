@@ -6,8 +6,6 @@ var g_resources = [
     { src : 'res/CloseNormal.png' },
     { src : 'res/CloseSelected.png' },
     { src : 'res/mario-sheet_default.png' },
-    { src : 'res/freewill/dpad.png'},
-    { src : 'res/freewill/pad.png'},
     { src : 'res/headers-100.png' },
 
     //plist

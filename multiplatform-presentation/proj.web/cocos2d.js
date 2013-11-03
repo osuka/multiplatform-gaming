@@ -41,7 +41,8 @@
             'src/resource.js',
             'src/physicsSprite.js',
             'src/initialScene.js',
-            'src/chapters.js'
+            'src/chapters.js',
+            'src/joystick.js'
         ]
     };
 

@@ -31,7 +31,7 @@
 // this silly 'require' is not requirejs or nodejs require, it just loads a
 // file and executes it
 require('jsb.js');
-require('src/freewill/Freewill.js');
+require('src/joystick.js');
 require('src/physicsSprite.js');
 require('src/resource.js');
 require('src/initialScene.js');
