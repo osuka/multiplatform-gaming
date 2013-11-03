@@ -18,18 +18,19 @@ game.chapters.push( game.BaseLayer.extend({
         ];
         
         this.addBodyText(text);
-        
-        this.bodyLabel.touched = function () {
-            game.Controller.showNextChapter();
-        };
-
         return true;
     },
+
+    fire: function () {
+        game.Controller.showNextChapter();
+    }
 
 }));
 
 
 game.chapters.push( game.BaseLayer.extend({
+
+    TAG_MARIO : 99999901,
 
     init: function () {
         this._super();
@@ -45,7 +46,7 @@ game.chapters.push( game.BaseLayer.extend({
         
         this.addBodyText(text);
         
-        this.bodyLabel.touched = function () {
+        this.bodyLabel.touchedStart = function () {
             game.Controller.showNextChapter();
         };
 
@@ -61,7 +62,7 @@ game.chapters.push( game.BaseLayer.extend({
         cache.addSpriteFrames("res/mario-sheet_default.plist");
 
         var mario = cc.Sprite.createWithSpriteFrameName("minimario-walk-01.png");
-        spriteBatch.addChild(mario);
+        spriteBatch.addChild(mario, 0, this.TAG_MARIO);
         mario.setPosition(cc.p(0, game.worldsize.height/2));
 
         var animation = cc.Animation.create();
@@ -84,8 +85,17 @@ game.chapters.push( game.BaseLayer.extend({
         )));
 
         this.addChild(spriteBatch);
-    }
+    },
 
+    fire: function () {
+        //game.Controller.showNextChapter();
+        var height = game.worldsize.height/5;
+        var mario = this.getChildByTagRecursive(this, this.TAG_MARIO);
+        mario.runAction(cc.Sequence.create(
+                cc.MoveBy.create( 0.2, cc.p(0, height) ),
+                cc.MoveBy.create( 0.15, cc.p(0, -height) )
+        ));
+    }
 
 }));
 
@@ -108,7 +118,7 @@ game.chapters.push( game.BaseLayer.extend({
         
         this.addBodyText(text);
         
-        this.bodyLabel.touched = function () {
+        this.bodyLabel.touchedStart = function () {
             game.Controller.showNextChapter();
         };
 

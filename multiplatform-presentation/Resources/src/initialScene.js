@@ -33,47 +33,78 @@ game.scale = 1.0; // is adjusted in scene creation
 
 game.BaseLayer = cc.Layer.extend({
 
+    DEBUG_OBJECT_TAG: 99999990,
+    JOYSTICK_BASE_TAG: 99999991,
+    JOYSTICK_PAD_TAG: 99999992,
+    JOYSTICK_BUTTON_TAG: 99999993,
+
     ctor: function() {
         this._super();
         cc.associateWithNative( this, cc.Layer );
     },
 
-    onTouchesEnded: function (touches) {
-        // Find child clicked - children are ordered by zorder
-        // in parent
-        if (!touches) return;
-        var point = this.convertTouchToNodeSpace(touches[0]);
-        var i;
+    _walkChildren: function (callback) {
         var children = this.getChildren();
+        var i;
         for(i = children.length-1; i >= 0; i--) {
             var child = children[i];
-            var boundingBox = child.getBoundingBox();
-            if (cc.rectContainsPoint(boundingBox, point)) {
-                if (child.touched) {
-                    var result = child.touched(point);
-                    if (result) { // stop propagating event if true
-                        return;
-                    }
-                }
+            if (callback(child) === true) {
+                break;
             }
         }
     },
 
-    onTouchesMoved: function (touches) {
-        // Find child clicked - children are ordered by zorder
-        // in parent
-        if (!touches) return;
-        var point = this.convertTouchToNodeSpace(touches[0]);
+    getChildByTagRecursive: function (base, tag) {
+        var obj = base.getChildByTag(tag);
+        if (obj) return obj;
+        var children = base.getChildren();
         var i;
-        var children = this.getChildren();
         for(i = children.length-1; i >= 0; i--) {
             var child = children[i];
+            var found = this.getChildByTagRecursive(child, tag);
+            if (found) return found;
+        }
+    },
+
+    // The release event - as it stands in this code,
+    // it could be missed by the target 
+    onTouchesEnded: function (touches) {
+        var j;
+        var joystickMoved = false;
+        var joystickBase = this.getChildByTag(this.JOYSTICK_BASE_TAG);
+        var point;
+        var callback = function (child) {
             var boundingBox = child.getBoundingBox();
             if (cc.rectContainsPoint(boundingBox, point)) {
-                if (child.touchedMoved) {
-                    var result = child.touchedMoved(point);
-                    if (result) { // stop propagating event if true
-                        return;
+                joystickMoved = joystickMoved || (child === joystickBase);
+                return child.touched && child.touched(point);
+            }
+        };
+        for(j = 0; j < touches.length; j++) {
+            point = this.convertTouchToNodeSpace(touches[j]);
+            this._walkChildren(callback);
+        }
+
+        // joystick is a special case, release it if there's no touches
+        if (!joystickMoved && joystickBase) {
+            joystickBase.touched();
+        }
+    },
+
+    onTouchesMoved: function (touches) {
+        var children = this.getChildren();
+        var i,j;
+        for(j = 0; j < touches.length; j++) {
+            var point = this.convertTouchToNodeSpace(touches[j]);
+            for(i = children.length-1; i >= 0; i--) {
+                var child = children[i];
+                var boundingBox = child.getBoundingBox();
+                if (cc.rectContainsPoint(boundingBox, point)) {
+                    if (child.touchedMoved) {
+                        var result = child.touchedMoved(point);
+                        if (result) { // stop propagating event if true
+                            return;
+                        }
                     }
                 }
             }
@@ -84,17 +115,19 @@ game.BaseLayer = cc.Layer.extend({
         // Find child clicked - children are ordered by zorder
         // in parent
         if (!touches) return;
-        var point = this.convertTouchToNodeSpace(touches[0]);
-        var i;
+        var i,j;
         var children = this.getChildren();
-        for(i = children.length-1; i >= 0; i--) {
-            var child = children[i];
-            var boundingBox = child.getBoundingBox();
-            if (cc.rectContainsPoint(boundingBox, point)) {
-                if (child.touchedStart) {
-                    var result = child.touchedStart(point);
-                    if (result) { // stop propagating event if true
-                        return;
+        for(j = 0; j < touches.length; j++) {
+            var point = this.convertTouchToNodeSpace(touches[j]);
+            for(i = children.length-1; i >= 0; i--) {
+                var child = children[i];
+                var boundingBox = child.getBoundingBox();
+                if (cc.rectContainsPoint(boundingBox, point)) {
+                    if (child.touchedStart) {
+                        var result = child.touchedStart(point);
+                        if (result) { // stop propagating event if true
+                            return;
+                        }
                     }
                 }
             }
@@ -118,7 +151,7 @@ game.BaseLayer = cc.Layer.extend({
         this.addJoystick();
 
         this.scheduleUpdate();
-        this.toggleDebug();
+//        this.toggleDebug();
         return true;
     },
     
@@ -140,7 +173,7 @@ game.BaseLayer = cc.Layer.extend({
         // this.titleLabel.color = cc.ccc(180, 0, 0);
         this.addChild(this.titleLabel);
         var _this = this;
-        this.titleLabel.touched = function () {
+        this.titleLabel.touchedStart = function () {
             _this.toggleDebug();
         };
         return this.titleLabel;
@@ -186,14 +219,16 @@ game.BaseLayer = cc.Layer.extend({
         var director = cc.Director.getInstance();
 
         // display physics objects
-        if (typeof game.debugDraw === 'undefined') {
+        var tag = this.DEBUG_OBJECT_TAG;
+        var d = this.getChildByTag(tag);
+        if (!d) {
             game.debugDraw = new cc.PhysicsDebugNode();
             game.debugDraw.init();
             game.debugDraw.setSpace(game.space);
-            this.addChild(game.debugDraw);
+            this.addChild(game.debugDraw, 0 /* zorder */, tag);
             director.setDisplayStats(true);
         } else {
-            this.removeChild(game.debugDraw);
+            this.removeChild(d);
             game.debugDraw = undefined;
             director.setDisplayStats(false);
         }
@@ -244,32 +279,50 @@ game.BaseLayer = cc.Layer.extend({
     addJoystick: function() {
 
         var _this = this;
-        var pos = cc.p(300, 300);
-        var joystickBase = cc.Sprite.create('res/freewill/dpad.png');
+        var size = cc.p(150, 150);
+        var pos = cc.p(size.x/2 + size.x*0.10, size.y/2 + size.y * 0.10);
+        var joystickBase = cc.Sprite.create('res/joystick-base.png');
         joystickBase.setPosition(pos);
-        joystickBase.setZOrder(100);
         joystickBase.touchedStart = joystickBase.touchedMoved = function (touchPoint) {
-            game.joystick.stopAllActions();
-            game.joystick.setPosition(touchPoint);
-            return true; // consume event
+            var joystick = _this.getChildByTag(_this.JOYSTICK_PAD_TAG);
+            if (joystick) {
+                joystick.stopAllActions();
+                joystick.setPosition(touchPoint);
+                return true; // consume event
+            }
+            return false;
         };
-        joystickBase.touched = function (touchPoint) {
-            game.joystick.setPosition(touchPoint);
-            game.joystick.stopAllActions();
+        joystickBase.touched = function () {
+            var joystickBase = _this.getChildByTag(_this.JOYSTICK_BASE_TAG);
+            var joystick = _this.getChildByTag(_this.JOYSTICK_PAD_TAG);
+            if (!joystickBase || !joystick) {
+                return false;
+            }
+            joystick.stopAllActions();
             var center = joystickBase.getPosition();
-            var xd = touchPoint.x - center.x;
-            var yd = touchPoint.y - center.y;
+            var currentPos = joystick.getPosition();
+            var xd = currentPos.x - center.x;
+            var yd = currentPos.y - center.y;
             var distance = Math.sqrt(xd*xd + yd*yd);
-            game.joystick.runAction(cc.MoveTo.create( 0.10, center ));
+            joystick.runAction(cc.MoveTo.create( 0.10, center ));
             return true; // consume event
         };
-        this.addChild(joystickBase);
+        this.addChild(joystickBase, 100 /* zorder */, this.JOYSTICK_BASE_TAG);
 
-        game.joystick = cc.Sprite.create('res/freewill/pad.png');
-        game.joystick.setPosition(pos);
-        game.joystick.setZOrder(110);
-        this.addChild(game.joystick);
+        var joystick = cc.Sprite.create('res/joystick-pad.png');
+        joystick.setPosition(pos);
+        this.addChild(joystick, 110 /* zorder */, this.JOYSTICK_PAD_TAG);
 
+        var joystickButton = cc.Sprite.create('res/joystick-button.png');
+        var buttonPos = cc.p(game.worldsize.width - pos.x, pos.y);
+        joystickButton.setPosition(buttonPos);
+        joystickButton.touchedStart = function (touchPoint) {
+            if (typeof _this.fire === 'function') {
+                _this.fire(touchPoint);
+            }
+            return true; // consume event
+        };
+        this.addChild(joystickButton, 110 /* zorder */, this.JOYSTICK_BUTTON_TAG);
 
         // var centerBody = new cp.StaticBody(5,1);
         // centerBody.setPos(cc.p(300, 300));
@@ -304,9 +357,6 @@ game.BaseLayer = cc.Layer.extend({
                               
     update : function (dt) {
         game.space.step(dt);
-        if (game.joystickSpace) {
-            game.joystickSpace.step(dt);
-        }
     },
 
 });
