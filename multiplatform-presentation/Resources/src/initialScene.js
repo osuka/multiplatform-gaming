@@ -100,9 +100,6 @@ game.BaseLayer = cc.Layer.extend({
         // this.titleLabel.color = cc.ccc(180, 0, 0);
         this.addChild(this.titleLabel);
         var _this = this;
-        this.titleLabel.touchedStart = function () {
-            _this.toggleDebug();
-        };
         return this.titleLabel;
     },
     
