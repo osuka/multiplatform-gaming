@@ -19,6 +19,7 @@ game.PhysicsSpriteHelper = {
     // mass: for the physical body
     // elasticity: for the physical body
     // friction: for the physical body
+    // scale: (optional) scale for the created object
     // angle: for the physical body
     // callback: called after creation finishes (may need to asynchronously
     //           load assets before finishing creation)
@@ -41,11 +42,15 @@ game.PhysicsSpriteHelper = {
                 space = params.space;
             }
 
-            sprite.setScale(game.scale);
+            var scale = game.scale;
+            if (typeof params.scale !== 'undefined') {
+                scale = params.scale;
+            }
+            sprite.setScale(scale);
 
             // Image size
-            var spriteWidth = sprite.getContentSize().width * game.scale;
-            var spriteHeight = sprite.getContentSize().height * game.scale;
+            var spriteWidth = sprite.getContentSize().width * scale;
+            var spriteHeight = sprite.getContentSize().height * scale;
             
             // Physical body
             var mass = 5;
