@@ -43,7 +43,7 @@ game.Joystick = cc.Layer.extend({
 
         // joystick is a special case, release it if there's no touches
         if (!joystickMoved && joystickBase) {
-            // joystickBase.touchedEnded();
+            joystickBase.touchedEnded();
         }
     },
 

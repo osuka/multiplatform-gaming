@@ -59,25 +59,27 @@ game.addPhysicalMario = function (spriteBatch) {
 
 // Simple movement based on touch joystick
 game.moveMario = function (mario, p, dt) {
-    var currentVel = mario.getBody().getVel();
 
-    // Note: setting velocity directly is a *BAD* thing
-    // Better to apply impulses
-    mario.getBody().setVel(cp.v(p.x * 4, currentVel.y));
+    var impulse = cp.v(p.x * 4, 0);
+
     if (p.x < 0) {
         mario.setScaleX( -1 * Math.abs(mario.getScaleX()) ); // flip   
-    } else {
+    } else if (p.x > 0) {
         mario.setScaleX( 1 * Math.abs(mario.getScaleX()) );
     }
 
+    var currentVel = mario.body.getVel();
     if (p.y > 20 && !mario.jumping) {
         cc.log('jump');
         mario.jumping = true;
-        var velX = mario.getBody().getVel().x;
-        mario.getBody().setVel(cp.v(velX, 200));
+        impulse.y = 1000;
     } else if (currentVel.y < 0.1 && currentVel.y > -0.1 && mario.jumping) {
         mario.jumping = false;
+        mario.body.setAngle(0);
     }
+
+    mario.getBody().applyImpulse(impulse, cp.v(0,0));
+
 };
 
 
@@ -380,11 +382,13 @@ game.chapters.push( game.BaseLayer.extend({
         this.addTitle("Lookup for");
         var text = [
             " ",
-            "Garbage collection between SpiderMonkey and your native environment",
+            "Performance: Physics in Browsers",
             " ",
-            "Scale! Use getDPI if available. IF not, well... fake one?",
+            "Scale: Don't do silly 'hd' or '2x' images. There's 1.5, 1.6, plus important is physical size. Use getDPI if available. If not, well... fake one?",
             " ",
             "Design: Designers don't know how to deal with responsive design. They say they do, but REALLY they don't.",
+            " ",
+            "Time: These design don't use the dt properly",
             " ",
             "Take a look at my code: github.com/osuka. Ask, fork, annoy me please."
         ];

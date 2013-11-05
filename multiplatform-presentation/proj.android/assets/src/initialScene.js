@@ -27,6 +27,20 @@
 var game = game || {};
 
 
+// Helper function to lookup an object by TAG in a hierarchy
+game.findChildByTagRecursive = function (base, tag) {
+    var obj = base.getChildByTag(tag);
+    if (obj) return obj;
+    var children = base.getChildren();
+    var i;
+    for(i = children.length-1; i >= 0; i--) {
+        var child = children[i];
+        var found = game.findChildByTagRecursive(child, tag);
+        if (found) return found;
+    }
+};
+
+
 // Set scale based on DPI
 
 game.scale = 1.0; // is adjusted in scene creation
@@ -40,18 +54,6 @@ game.BaseLayer = cc.Layer.extend({
     ctor: function() {
         this._super();
         cc.associateWithNative( this, cc.Layer );
-    },
-
-    getChildByTagRecursive: function (base, tag) {
-        var obj = base.getChildByTag(tag);
-        if (obj) return obj;
-        var children = base.getChildren();
-        var i;
-        for(i = children.length-1; i >= 0; i--) {
-            var child = children[i];
-            var found = this.getChildByTagRecursive(child, tag);
-            if (found) return found;
-        }
     },
 
     init: function () {
@@ -74,7 +76,7 @@ game.BaseLayer = cc.Layer.extend({
         game.space.gravity = cp.v(0, -400);
         
         this.createBoundaries();
-        
+         
         this.addJoystick();
 
         this.scheduleUpdate();
@@ -100,9 +102,6 @@ game.BaseLayer = cc.Layer.extend({
         // this.titleLabel.color = cc.ccc(180, 0, 0);
         this.addChild(this.titleLabel);
         var _this = this;
-        this.titleLabel.touchedStart = function () {
-            _this.toggleDebug();
-        };
         return this.titleLabel;
     },
     
@@ -164,7 +163,7 @@ game.BaseLayer = cc.Layer.extend({
     // Create physics objects to enclose the screen
     //
     createBoundaries: function () {
-        var thickness = 2;
+        var thickness = 30;
 
         var floor = game.space.addShape(new cp.SegmentShape(
             game.space.staticBody,
@@ -242,7 +241,7 @@ game.BaseLayer = cc.Layer.extend({
 
     // button2 moves to previous or next slide based on joystick position
     fire2: function () {
-        var joystick = this.getChildByTagRecursive(this, this.TAG_JOYSTICK_LAYER);
+        var joystick = game.findChildByTagRecursive(this, this.TAG_JOYSTICK_LAYER);
         var p = joystick.getPadPosition();
         if (p.x < 0) {
             game.Controller.showPrevChapter();

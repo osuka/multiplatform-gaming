@@ -12,17 +12,28 @@ game.PhysicsSpriteHelper = {
 
     // Create a new sprite with an associated physics body
     // file: file name
+    // spriteFrame: frame (if defined, batch defined too)
+    // spriteBatch: batch (if defined, frame defined too)
+    // tag: tag for sprite (optional)
     // pos: position on screen
     // mass: for the physical body
     // elasticity: for the physical body
     // friction: for the physical body
+    // scale: (optional) scale for the created object
     // angle: for the physical body
     // callback: called after creation finishes (may need to asynchronously
     //           load assets before finishing creation)
     //
     createSprite: function (params) {
 
-        var sprite = cc.PhysicsSprite.create(params.file);
+        var sprite;
+        if (params.file) {
+            sprite = cc.PhysicsSprite.create(params.file);
+        } else if (params.spriteFrame) {
+            var cache = cc.SpriteFrameCache.getInstance();
+            sprite = cc.PhysicsSprite.createWithSpriteFrameName(params.spriteFrame);
+            params.spriteBatch.addChild(sprite, 0, params.tag);
+        }
 
         var postLoadAction = function () {
         
@@ -31,9 +42,15 @@ game.PhysicsSpriteHelper = {
                 space = params.space;
             }
 
+            var scale = game.scale;
+            if (typeof params.scale !== 'undefined') {
+                scale = params.scale;
+            }
+            sprite.setScale(scale);
+
             // Image size
-            var spriteWidth = sprite.getContentSize().width;
-            var spriteHeight = sprite.getContentSize().height;
+            var spriteWidth = sprite.getContentSize().width * scale;
+            var spriteHeight = sprite.getContentSize().height * scale;
             
             // Physical body
             var mass = 5;
@@ -78,7 +95,7 @@ game.PhysicsSpriteHelper = {
 
         // Dynamic loading is required when running in a browser
         // see http://www.cocos2d-x.org/forums/19/topics/15685
-        if (typeof document !== 'undefined') { // web
+        if (typeof document !== 'undefined' && params.file) { // web
             var textureCache = cc.TextureCache.getInstance();
             var texture = textureCache.textureForKey(params.file);
             if (texture.isLoaded()) {

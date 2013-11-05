@@ -33,7 +33,7 @@ game.Joystick = cc.Layer.extend({
             var boundingBox = child.getBoundingBox();
             if (cc.rectContainsPoint(boundingBox, point)) {
                 joystickMoved = joystickMoved || (child === joystickBase);
-                return child.touched && child.touched(point);
+                return child.touchedEnded && child.touchedEnded(point);
             }
         };
         for(j = 0; j < touches.length; j++) {
@@ -43,7 +43,7 @@ game.Joystick = cc.Layer.extend({
 
         // joystick is a special case, release it if there's no touches
         if (!joystickMoved && joystickBase) {
-            // joystickBase.touched();
+            joystickBase.touchedEnded();
         }
     },
 
@@ -96,11 +96,11 @@ game.Joystick = cc.Layer.extend({
         this.setTouchEnabled(true);
 
         var _this = this;
-        var size = cc.p(150, 150);
-        var pos = cc.p(size.x/2 + size.x*0.10, size.y/2 + size.y * 0.10);
+        var size = cc.p(150 * game.scale/3, 150 * game.scale/3);
+        var pos = cc.p(size.x/2 + size.x*0.10, size.y/2);
         var joystickBase = cc.Sprite.create('res/joystick-base.png');
         joystickBase.setPosition(pos);
-        joystickBase.setScale(game.scale/2);
+        joystickBase.setScale(game.scale/3);
         joystickBase.touchedStart = joystickBase.touchedMoved = function (touchPoint) {
             var joystick = _this.getChildByTag(_this.JOYSTICK_PAD_TAG);
             if (joystick) {
@@ -110,7 +110,7 @@ game.Joystick = cc.Layer.extend({
             }
             return false;
         };
-        joystickBase.touched = function () {
+        joystickBase.touchedEnded = function () {
             var joystickBase = _this.getChildByTag(_this.JOYSTICK_BASE_TAG);
             var joystick = _this.getChildByTag(_this.JOYSTICK_PAD_TAG);
             if (!joystickBase || !joystick) {
@@ -129,12 +129,12 @@ game.Joystick = cc.Layer.extend({
 
         var joystick = cc.Sprite.create('res/joystick-pad.png');
         joystick.setPosition(pos);
-        joystick.setScale(game.scale/2);
+        joystick.setScale(game.scale/3);
         this.addChild(joystick, 110 /* zorder */, this.JOYSTICK_PAD_TAG);
 
         var joystickButton1 = cc.Sprite.create('res/joystick-button.png');
         joystickButton1.setPosition(cc.p(game.worldsize.width - pos.x*2.6, pos.y));
-        joystickButton1.setScale(game.scale/2);
+        joystickButton1.setScale(game.scale/3);
         joystickButton1.touchedStart = function (touchPoint) {
             var parent = _this.getParent();
             if (typeof parent.fire1 === 'function') {
@@ -147,7 +147,7 @@ game.Joystick = cc.Layer.extend({
 
         var joystickButton2 = cc.Sprite.create('res/joystick-button.png');
         joystickButton2.setPosition(cc.p(game.worldsize.width - pos.x, pos.y));
-        joystickButton2.setScale(game.scale/2);
+        joystickButton2.setScale(game.scale/3);
         joystickButton2.touchedStart = function (touchPoint) {
             var parent = _this.getParent();
             if (typeof parent.fire2 === 'function') {
