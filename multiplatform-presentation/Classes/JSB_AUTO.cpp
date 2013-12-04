@@ -68,7 +68,8 @@ JSBool js_constructor(JSContext* cx, uint32_t argc, jsval* vp){
         JSB::JSBinding* cobj = new JSB::JSBinding();
         cobj->autorelease();
         js_type_class_t *p;
-        long typeId = t.s_id();
+        uint32_t typeId = t.s_id();
+
         auto typeMapIter = _js_global_type_map.find(typeId);
 
         CCASSERT(typeMapIter != _js_global_type_map.end(), "Can't find the class type!");
