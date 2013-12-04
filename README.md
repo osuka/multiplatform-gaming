@@ -58,25 +58,28 @@ Finally, on the iOS Target I had to remove and re-add `OpenGLES.framework`, `UIK
 
 ### Android project creation notes
 
-- Doesn't seem to copy javah builder. Edit `.project` and remove the external build (probably can be done via Eclipse). Can also be copied from other project. (`.externalToolBuilder` folder)
-- If desired, edit `jni/Application.mk` to add more binaries
-  - armeabi armeabi-v7a
-- Defined in Preferences/C/C++/Build/Build Variables:
+- Native part:
+  - If desired, edit `jni/Application.mk` to add more binaries
+    - armeabi armeabi-v7a
+  - Edit `build_native.py` to fix path names:
+    - Replace the two occurrences of `../../../XXXX` with `../../../cocos2d-  x/XXXX`
+  - New sources are to be added to the `LOCAL_SRC_FILES` tag in `Android.mk`.
+  - If we need to use a library, for instance `network`, add:
+    - `LOCAL_WHOLE_STATIC_LIBRARIES += jsb_network_static`
+    - `$(call import-module,scripting/javascript/bindings/network)`
+    - To know the static library name, just take a look at the `Android.mk`file of the module you want to include.
+
+- Eclipse part
+  - Go to Import / Existing Android Code into Workspace and Browse to `cocos2d-x/cocos/2d/platform` to import `libcocos2dx`
+  - Go to project properties, Android, select a Build Target that is installed in our system and `Add` a refernce to `libcocos2dx`
+  - Note that `android:configChanges="orientation|screenSize|smallestScreenSize` doesn't seem to be supported in android-10.
+
+- (Optional) Defined in Preferences/C/C++/Build/Build Variables:
   - `NDK_ROOT=/Users/osuka/Documents/code/android/ndk`
   - `COCOS2DX_ROOT=/Users/osuka/Documents/code/cocos2d-x`
 - In environment defined them to export them as system variables
   - `NDK_ROOT=${NDK_ROOT}`
   - `COCOS2DX_ROOT=${COCOS2DX_ROOT}` 
-- Lots of trouble because I move the project outside of the `cocos2d-x/projects folder`
-  - Added `${ProjDirPath}/../Classes` to Properties/C/C++ General/Includes
-  - Edited the `build_native.sh` paths to better reflect my structure (see below, remember to remove `obj/local`)
-
-```
-COCOS2DX_ROOT="${COCOS2DX_ROOT}"
-APP_ROOT="$DIR/.."
-APP_ANDROID_ROOT="$DIR"
-BINDINGS_JS_ROOT="${COCOS2DX_ROOT}/scripting/javascript/bindings/js"
-```
 
 # Compiling and running
 
