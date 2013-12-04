@@ -16,6 +16,8 @@ git submodule update
 ./create-multi-platform-projects.py -p multiplatform-presentation -k com.gatillos.multiplatformpresentation -l javascript
 ```
 
+After creating the project, I moved the resulting sample project from `cocos2d-x/projects/multiplatform-presentation` to a separate folder, see below.
+
 Requirements for using it with cocos2d-html:
 
 ```
@@ -43,7 +45,16 @@ It's very important to understand the XCode structure:
 
 If you move the project around or its dependencies, you'll have to tweak settings taking into account each target and the shared components.
 
-Particular to my case, because I want to have the project in a separate folder. I have all paths relative to that directory so there's a lot of $(SRCDIR)/../../../cocos2d-x (#ugly).
+Particular to my case, because I want to have the project in a separate folder, I have all paths relative to that directory I had to update the following files in the project to point to the correct location (simply click on them in XCode and clicking on the Folder icon in the Location view in the right panel):
+- `jsb_cocos2d_gui.js`
+- `jsb_cocos2d_studio.js`
+- `cocos2d_libs.xcodeproj`
+- Repeat for all files inside the `JS Common` directory.
+
+
+Also, had to update in the XCode project, in project / Build Settings / Header Search Paths all the `$(SRCROOT)/../../../XXXXX` to be `$(SRCROOT)/../../../cocos2d-x/XXXXX`. Then do the same for the individual targets (ios and mac).
+
+Finally, on the iOS Target I had to remove and re-add `OpenGLES.framework`, `UIKit.framework` as they were pointing to different versions, and manually add `libchipmunk iOS.a`, `libcocos2dx iOS.a`, `libcocos2dx-extensions iOS.a`, `libCocosDenshion iOS.a`, `libjsbindings iOS.a`. Do the same for the Mac version (with corresponding `Mac.a` libraries).
 
 ### Android project creation notes
 
@@ -111,4 +122,4 @@ I haven't been able to even try running it yet, but the theory is that all you m
 
 # Final notes
 
-cocos2d-x is having a major refactoring that includes lots of directory renaming and moving. I'll try to keep up with the changes but if you run into trouble, just checkout to 3e017e1a4249a4364ef9c51d0d79350ef957afa1 for cocos2d-x and 3aef34057cf6e16cbf50f2e67f260fd57e473430 for cocos2d-html. Later versions are likely to work fine though.
+cocos2d-x is having a major refactoring that includes lots of directory renaming and moving. I'm working on the `develop` branch which updates quite frequently. If you run into trouble just checkout to f41a7a9bee1d0a61228fd2208ed0d7ba0588e9ce for cocos2d-x and 77092e7a04564990685dfcc0105c38068cd94084 for cocos2d-html. Later versions are likely to work fine though.

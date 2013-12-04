@@ -12,6 +12,8 @@
 #include "JSB_AUTO.h"
 #include "cocos2d.h"
 #include "cocos2d_specifics.hpp"
+#include "js_manual_conversions.h"
+#include "jsapi.h"
 
 // Binding specific object by defining JSClass
 JSClass*        jsb_class;
@@ -62,21 +64,21 @@ JSBool js_getDPI(JSContext* cx, uint32_t argc, jsval* vp){
 JSBool js_constructor(JSContext* cx, uint32_t argc, jsval* vp){
     cocos2d::log("JS Constructor...");
     if (argc == 0) {
-        JSB::JSBinding* cobj = new JSB::JSBinding();
-        cocos2d::Object* ccobj = dynamic_cast<cocos2d::Object*>(cobj);
-        if (ccobj) {
-            ccobj->autorelease();
-        }
         TypeTest<JSB::JSBinding> t;
-        js_type_class_t* typeClass;
-        uint32_t typeId = t.s_id();
-        HASH_FIND_INT(_js_global_type_ht, &typeId, typeClass);
-        assert(typeClass);
-        JSObject* obj = JS_NewObject(cx, typeClass->jsclass, typeClass->proto, typeClass->parentProto);
-        JS_SET_RVAL(cx, vp, OBJECT_TO_JSVAL(obj));
-        
-        js_proxy_t* p = jsb_new_proxy(cobj, obj);
-        JS_AddNamedObjectRoot(cx, &p->obj, "JSB::JSBinding");
+        JSB::JSBinding* cobj = new JSB::JSBinding();
+        cobj->autorelease();
+        js_type_class_t *p;
+        long typeId = t.s_id();
+        auto typeMapIter = _js_global_type_map.find(typeId);
+
+        CCASSERT(typeMapIter != _js_global_type_map.end(), "Can't find the class type!");
+        p = typeMapIter->second;
+        CCASSERT(p, "The value is null.");
+
+        JSObject *_tmp = JS_NewObject(cx, p->jsclass, p->proto, p->parentProto);
+        js_proxy_t *pp = jsb_new_proxy(cobj, _tmp);
+        JS_AddObjectRoot(cx, &pp->obj);
+        JS_SET_RVAL(cx, vp, OBJECT_TO_JSVAL(_tmp));
         
         return JS_TRUE;
     }
@@ -165,17 +167,16 @@ void jsBinding_register(JSContext* cx, JSObject* global){
     TypeTest<JSB::JSBinding> t;
     js_type_class_t* p;
     uint32_t typeId = t.s_id();
-    HASH_FIND_INT(_js_global_type_ht, &typeId, p);
-    
-    if (!p) {
-        p = (js_type_class_t* )malloc(sizeof(js_type_class_t));
-        p->type = typeId;
+
+    if (_js_global_type_map.find(typeId) == _js_global_type_map.end())
+    {
+        p = (js_type_class_t *)malloc(sizeof(js_type_class_t));
         p->jsclass = jsb_class;
         p->proto = jsb_prototype;
         p->parentProto = NULL;
-        HASH_ADD_INT(_js_global_type_ht, type, p);
+        _js_global_type_map.insert(std::make_pair(typeId, p));
     }
-    HASH_FIND_INT(_js_global_type_ht, &typeId, p);
+    
     assert(p);
 }
 
@@ -218,7 +219,7 @@ JSBool JSB_cocos2dx_release(JSContext* cx, uint32_t argc, jsval *vp){
 //
 void register_all_my_jsb(JSContext* cx, JSObject* obj){
 
-    jsval nsval;
+    JS::RootedValue nsval(cx);
     JSObject* ns;
     
     JS_GetProperty(cx, obj, "JSB", &nsval);
@@ -227,7 +228,7 @@ void register_all_my_jsb(JSContext* cx, JSObject* obj){
         // Create "JSB" object
         ns = JS_NewObject(cx, NULL, NULL, NULL);
         nsval = OBJECT_TO_JSVAL(ns);
-        JS_SetProperty(cx, obj, "JSB", &nsval);
+        JS_SetProperty(cx, obj, "JSB", nsval);
     }
     else{
         // Added to existing "JSB" object (allows modular initialization)
