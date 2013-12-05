@@ -7,6 +7,7 @@ This is short presentation showcasing usage of [cocos2d-x](https://github.com/co
 You can try the HTML5 version on [the demo site](http://gatillos.com/presentation). It will load slowly since it's not packaged.
 
 * `cocos2d-x` is having a major refactoring that includes lots of file renaming/moving. I work off the `develop` branch, prone to change. I've included below checkouts to the specific commit IDs I used for this project. Checkout to those versions if it doesn't compile/work with a later one, but I aim to work with the latest `develop` commit.
+
 ```
 git clone https://github.com/osuka/multiplatform-gaming.git
 
