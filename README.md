@@ -1,5 +1,58 @@
 # multiplatform-gaming
 
+This is short presentation showcasing usage of cocos2d-x for development. It works on Android 2.3+, iOS, Mac and Web. It should be very easy to have it workin in Windows and Linux but I haven't tried it yet.
+
+## Run it
+
+You can try the HTML5 version in (http://gatillos.com/presentation)[http://gatillos.com/presentation].
+
+* cocos2d-x is having a major refactoring that includes lots of directory renaming and moving. I'm working on the `develop` branch which updates quite frequently. I've included below checkouts to the specific commit IDs I used for this presentation. Checkout to those versions if it doesn't compile/work with a later one, but I aim to work with the latest `develop` commit.
+```
+git clone https://github.com/osuka/multiplatform-gaming.git
+git clone https://github.com/cocos2d/cocos2d-x.git
+cd cocos2d-x
+git checkout f41a7a9bee1d0a61228fd2208ed0d7ba0588e9ce
+git clone https://github.com/cocos2d/cocos2d-html5.git
+git checkout 77092e7a04564990685dfcc0105c38068cd94084
+```
+
+* The presentation uses an on-screen joystick that can be used to enable/disable physics debug mode, jump and going forward and backwards (press button + joystick left).
+
+## For Android (Eclipse, Android NDK and Android SDK required)
+
+
+- Launch Eclipse, import projects (Import -> Existing Android Code into Workspace):
+  - `multiplatform-gaming/multiplatform-presentation/proj.android`
+  - `cocos2d-x/cocos/2d/platform/android/java`
+- Compile native part:
+  - `multiplatform-gaming/multiplatform-presentation/proj.android/build_native.py`
+  - Optionally, add more architectures to `jni/Application.mk` (like `armeabi armeabi-v7a`)
+- Launch the project:
+  - From Eclipse (usual way)
+  - From command line: `ant -Dsdk.dir=<<YOUR_PATH_TO_ANDROID_SDK>> debug install`
+
+
+## For Mac and iOS (Xcode required)
+
+Simply open project `multiplatform-gaming/multiplatform-presentation/proj.ios_mac`. Then selection the target you want to run, from `ios` or `mac` and build/run as usual.
+
+## For Web/HTML5 version
+
+The normal web version can be run by just publishing the contents of `proj.web` folder into a web server, or if you just want to try it, launching.
+
+```
+python -m SimpleHTTPServer
+```
+
+Then go to `http://localhost:8000` to try it locally.
+
+## For Windows and Windows Phone
+
+I haven't been able to even try running it yet, but the theory is that all you might need is renaming some files under proj.win32 and updating some paths. Feel free to open a PR if you do.
+
+
+# Development Notes
+
 ## Notes on creating the base project
 
 Currently Using the develop branch of cocos2d-x in github (3.0).
@@ -33,7 +86,7 @@ Folder structure (for me):
 
 There are symbolic links in the repo that expect this structure. If you have things differently, just update the symlinks.
 
-### iOS and Mac project creation notes
+## iOS and Mac project creation notes
 
 It's very important to understand the XCode structure:
 
@@ -51,19 +104,16 @@ Particular to my case, because I want to have the project in a separate folder, 
 - `cocos2d_libs.xcodeproj`
 - Repeat for all files inside the `JS Common` directory.
 
-
 Also, had to update in the XCode project, in project / Build Settings / Header Search Paths all the `$(SRCROOT)/../../../XXXXX` to be `$(SRCROOT)/../../../cocos2d-x/XXXXX`. Then do the same for the individual targets (ios and mac).
 
 Finally, on the iOS Target I had to remove and re-add `OpenGLES.framework`, `UIKit.framework` as they were pointing to different versions, and manually add `libchipmunk iOS.a`, `libcocos2dx iOS.a`, `libcocos2dx-extensions iOS.a`, `libCocosDenshion iOS.a`, `libjsbindings iOS.a`. Do the same for the Mac version (with corresponding `Mac.a` libraries).
 
-### Android project creation notes
+## Android project creation Notes
 
 - Native part:
-  - If desired, edit `jni/Application.mk` to add more binaries
-    - armeabi armeabi-v7a
-  - Edit `build_native.py` to fix path names:
-    - Replace the two occurrences of `../../../XXXX` with `../../../cocos2d-  x/XXXX`
-  - New sources are to be added to the `LOCAL_SRC_FILES` tag in `Android.mk`.
+  - I edited `build_native.py` to fix path names:
+    - Replaced the two occurrences of `../../../XXXX` with `../../../cocos2d-  x/XXXX`
+  - Added some new sources to the `LOCAL_SRC_FILES` tag in `Android.mk`.
   - If we need to use a library, for instance `network`, add:
     - `LOCAL_WHOLE_STATIC_LIBRARIES += jsb_network_static`
     - `$(call import-module,scripting/javascript/bindings/network)`
@@ -72,57 +122,13 @@ Finally, on the iOS Target I had to remove and re-add `OpenGLES.framework`, `UIK
 - Eclipse part
   - Go to Import / Existing Android Code into Workspace and Browse to `cocos2d-x/cocos/2d/platform` to import `libcocos2dx`
   - Go to project properties, Android, select a Build Target that is installed in our system and `Add` a refernce to `libcocos2dx`
-  - Note that `android:configChanges="orientation|screenSize|smallestScreenSize` doesn't seem to be supported in android-10.
+  - Note that `android:configChanges="orientation|screenSize|smallestScreenSize` doesn't seem to be supported in android-10, so I removed it.
 
-- (Optional) Defined in Preferences/C/C++/Build/Build Variables:
+- If using Eclipse for C++ compilation, defined in Preferences/C/C++/Build/Build Variables:
   - `NDK_ROOT=/Users/osuka/Documents/code/android/ndk`
   - `COCOS2DX_ROOT=/Users/osuka/Documents/code/cocos2d-x`
-- In environment defined them to export them as system variables
-  - `NDK_ROOT=${NDK_ROOT}`
-  - `COCOS2DX_ROOT=${COCOS2DX_ROOT}` 
+  - In environment defined them to export them as system variables
+    - `NDK_ROOT=${NDK_ROOT}`
+    - `COCOS2DX_ROOT=${COCOS2DX_ROOT}` 
 
-# Compiling and running
 
-## XCode compiling for iOS and Mac
-
-Simply selection the target from _ios or _mac and build/run as usual.
-
-## Command line compiling for Android
-
-```
-cd proj.android
-./build_native.sh
-ant -Dsdk.dir=/Users/osuka/Documents/code/android/sdk/ debug install
-```
-
-## Eclipse compiling for Android
-
-Open Android Developer Tools (Eclipse version, the other one doesn't support native code yet)
-
-* Import -> Existing Android Code into Workspace
-* Browse to `multiplatform-presentation`
-* It will find `proj.android.` Click finish
-* Do the same for `cocos2d-x/cocos2dx/platform/android/java`. Create the `libcocos2dx`project.
-* You may have problems with Android versions. In theory it runs on 2.3+ (android 13). I'm going for API 14 (Android 4.0), just because I have a Kindle Fire HD. With no google APIs.
-  * So, open Project properties and set SDK to 4.0 or whatever you want. Make sure you set the same for `libcocos2dx` and your app.
-* Define the following in Preferences / C/C++ / Build / Build Variables
-  - `NDK_ROOT=/Users/osuka/Documents/code/android/ndk`
-  - `COCOS2DX_ROOT=/Users/osuka/Documents/code/cocos2d-x`
-
-* Run as "Android Application"
-
-## Web version
-
-The normal web version can be run by going to `proj.web` folder and launching.
-
-```
-python -m SimpleHTTPServer
-```
-
-## Windows version
-
-I haven't been able to even try running it yet, but the theory is that all you might need is renaming some files under proj.win32 and updating some paths. Feel free to open a PR if you do.
-
-# Final notes
-
-cocos2d-x is having a major refactoring that includes lots of directory renaming and moving. I'm working on the `develop` branch which updates quite frequently. If you run into trouble just checkout to f41a7a9bee1d0a61228fd2208ed0d7ba0588e9ce for cocos2d-x and 77092e7a04564990685dfcc0105c38068cd94084 for cocos2d-html. Later versions are likely to work fine though.
