@@ -148,9 +148,7 @@ game.BaseLayer = cc.Layer.extend({
         var tag = this.DEBUG_OBJECT_TAG;
         var d = this.getChildByTag(tag);
         if (!d) {
-            game.debugDraw = new cc.PhysicsDebugNode();
-            game.debugDraw.init();
-            game.debugDraw.setSpace(game.space);
+            game.debugDraw = cc.PhysicsDebugNode.create(game.space);
             this.addChild(game.debugDraw, 0 /* zorder */, tag);
             director.setDisplayStats(true);
         } else {
