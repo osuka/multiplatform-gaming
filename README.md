@@ -13,14 +13,14 @@ git clone https://github.com/osuka/multiplatform-gaming.git
 
 git clone https://github.com/cocos2d/cocos2d-x.git
 cd cocos2d-x
-git checkout f41a7a9bee1d0a61228fd2208ed0d7ba0588e9ce
+#OPTIONAL git checkout da24b6a7d8643493328a3eda1752532e024f1bf9
 git submodule init
 git submodule update
 cd ..
 
 git clone https://github.com/cocos2d/cocos2d-html5.git
 cd cocos2d-html5
-git checkout 77092e7a04564990685dfcc0105c38068cd94084
+#OPTIONAL git checkout Cocos2d-html5-v2.2.1
 git submodule init
 git submodule update
 cd ..

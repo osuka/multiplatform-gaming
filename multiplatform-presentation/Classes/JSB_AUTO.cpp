@@ -15,6 +15,8 @@
 #include "js_manual_conversions.h"
 #include "jsapi.h"
 
+using namespace cocos2d;
+
 // Binding specific object by defining JSClass
 JSClass*        jsb_class;
 JSObject*       jsb_prototype;
@@ -68,9 +70,9 @@ JSBool js_constructor(JSContext* cx, uint32_t argc, jsval* vp){
         JSB::JSBinding* cobj = new JSB::JSBinding();
         cobj->autorelease();
         js_type_class_t *p;
-        uint32_t typeId = t.s_id();
+        std::string typeName = t.s_name();
 
-        auto typeMapIter = _js_global_type_map.find(typeId);
+        auto typeMapIter = _js_global_type_map.find(typeName);
 
         CCASSERT(typeMapIter != _js_global_type_map.end(), "Can't find the class type!");
         p = typeMapIter->second;
@@ -167,15 +169,15 @@ void jsBinding_register(JSContext* cx, JSObject* global){
     
     TypeTest<JSB::JSBinding> t;
     js_type_class_t* p;
-    uint32_t typeId = t.s_id();
+    std::string typeName = t.s_name();
 
-    if (_js_global_type_map.find(typeId) == _js_global_type_map.end())
+    if (_js_global_type_map.find(typeName) == _js_global_type_map.end())
     {
         p = (js_type_class_t *)malloc(sizeof(js_type_class_t));
         p->jsclass = jsb_class;
         p->proto = jsb_prototype;
         p->parentProto = NULL;
-        _js_global_type_map.insert(std::make_pair(typeId, p));
+        _js_global_type_map.insert(std::make_pair(typeName, p));
     }
     
     assert(p);
